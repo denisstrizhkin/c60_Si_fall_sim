@@ -1,0 +1,73 @@
+# INIT
+units		metal
+dimension	3
+boundary	p p f
+atom_style	atomic
+atom_modify	map yes
+read_data	fall_s.input.data
+
+# GROUPS
+group		g_fu_1 id 162433:162492
+group		g_fu_2 id 162493:162552
+group		g_si_all id 1:162432
+lattice         diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region		r_si_center block -11 11 -11 11 -34 0 units lattice
+group		g_si_center region r_si_center
+group		g_si_thermostat subtract g_si_all g_si_center
+region		r_si_slice block -0.5 0.5 -11 11 -35 0 units lattice
+group		g_si_slice region r_si_slice
+
+# GROUPS FOR SPIN
+group		g_a_d id 162489
+group		g_a_u id 162458
+group		g_a_l id 162436
+group		g_a_r id 162460
+
+# POTENTIAL
+pair_style	hybrid airebo 3.0 tersoff/zbl
+pair_coeff	* * tersoff/zbl SiC.tersoff.zbl Si C
+pair_coeff	2 2 none
+pair_coeff	* * airebo CH.airebo NULL C
+neighbor	3.0 bin
+
+# COMPUTES
+compute		all_ke all ke/atom
+compute		si_occup g_si_center voronoi/atom occupation
+compute		si_vol g_si_center voronoi/atom
+compute		fu_ke g_fu_1 ke
+variable	vac atom "c_si_occup[1]==0"
+variable	ocup_val atom "c_si_occup[1]*(c_si_occup[1]>1)"
+variable	ocup atom "c_si_occup[1]>1"
+compute		vac g_si_center reduce sum v_vac
+compute		ocup_val g_si_center reduce sum v_ocup_val
+compute		ocup g_si_center reduce sum v_ocup
+variable	int equal "c_ocup_val-c_ocup"
+
+# THERMO
+reset_timestep	0
+timestep	0.001
+thermo          20
+thermo_style    custom step ke c_fu_ke c_vac v_int
+thermo_modify	lost ignore
+
+# FIX
+fix		f_1 all nve
+fix		f_2 g_si_thermostat nvt temp 1e-3 1e-3 $(100.0*dt)
+
+# DUMP
+dump		d_1 all custom 20 all.dump id c_all_ke v_vac c_si_occup[1] c_si_occup[2] c_si_vol[1] c_si_vol[2] type x y z
+
+# VELOCITY FU
+velocity	g_fu_1 set NULL NULL -231 sum yes units box
+
+# VELOCITY SPIN
+ velocity        g_a_d set NULL NULL -150 sum yes units box
+ velocity        g_a_u set NULL NULL 150 sum yes units box
+ velocity        g_a_l set NULL -150 NULL sum yes units box
+ velocity        g_a_r set NULL 150 NULL sum yes units box
+
+# RUN
+run		100
+
+# WRITE DATA
+write_data	fall.output.data

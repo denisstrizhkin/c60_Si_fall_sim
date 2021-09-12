@@ -55,7 +55,7 @@ fix		f_1 all nve
 fix		f_2 g_si_thermostat nvt temp 1e-3 1e-3 $(100.0*dt)
 
 # DUMP
-dump		d_1 all custom 20 all.dump id c_all_ke v_vac c_si_occup[1] c_si_occup[2] c_si_vol[1] c_si_vol[2] type x y z
+dump		d_1 all custom 20 all.dump type x y z c_all_ke v_vac c_si_occup[1] c_si_occup[2] c_si_vol[1] c_si_vol[2]
 
 # VELOCITY FU
 velocity	g_fu_1 set NULL NULL -231 sum yes units box
@@ -67,7 +67,7 @@ velocity	g_fu_1 set NULL NULL -231 sum yes units box
  velocity        g_a_r set NULL 150 NULL sum yes units box
 
 # RUN
-run		100
+run		5000
 
 # WRITE DATA
 write_data	fall.output.data

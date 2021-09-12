@@ -5,24 +5,24 @@ import numpy as np
 FILE_PATH = sys.argv[1]
 ZERO_LEVEL = float(sys.argv[2])
 NUM_ATOMS = 60
-AXES = {'x':2, 'y':3, 'z':4}
 
 def main():
     # read dump file
     with open(FILE_PATH, 'r') as input_file:
     	lines = input_file.readlines()
-    
-    num_of_lines = len(lines)
-    num_of_atoms = int(lines[3])
-    
+        
     head = lines[8].split(' ')
-    head[len(head) - 1] = head[len(head) - 1][:-2]
+    head[len(head) - 1] = head[len(head) - 1][:-1]
     keys = dict()
 
     for i in range (2, len(head)):
         keys[head[i]] = i
    
-    print(keys)
+    timesteps = dict()
+    for i in range (0, len(lines)):
+        if lines[i] == "ITEM: TIMESTEP\n":
+            print(lines[i + 1])
+            print(lines[i + 3])
 
     return None
 

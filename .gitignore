@@ -1,4 +1,4 @@
-all.dump
+*.dump
 result
 log.lammps
 fall.output.data

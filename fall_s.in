@@ -1,3 +1,6 @@
+# CONSTANTS
+variable	zeroLVL equal "-0.0184635"
+
 # INIT
 units		metal
 dimension	3
@@ -14,12 +17,6 @@ region		r_si_center block -11 11 -11 11 -34 0 units lattice
 group		g_si_center region r_si_center
 group		g_si_thermostat subtract g_si_all g_si_center
 group		g_output id 1
-
-# GROUPS FOR SPIN
-group		g_a_d id 162489
-group		g_a_u id 162458
-group		g_a_l id 162436
-group		g_a_r id 162460
 
 # POTENTIAL
 pair_style	hybrid airebo 3.0 tersoff/zbl
@@ -58,14 +55,18 @@ dump		d_vor g_output custom 20 vor_time.dump v_vVac v_vInt
 # VELOCITY FU
 velocity	g_fu set NULL NULL -231 sum yes units box
 
-# VELOCITY SPIN
-velocity        g_a_d set NULL NULL -150 sum yes units box
-velocity        g_a_u set NULL NULL 150 sum yes units box
-velocity        g_a_l set NULL -150 NULL sum yes units box
-velocity        g_a_r set NULL 150 NULL sum yes units box
-
 # RUN
-run		5000
+run		50
+
+# LAST 10 STEPS COMPUTES
+variable	c60_z atom "z-v_zeroLVL"
+
+# LAST 10 STEPS DUMPS
+undump		d_vor
+dump		d_c60_z g_fu custom 5 c60_z.dump v_c60_z
+
+# RUN LAST 10
+run		50
 
 # WRITE DATA
 write_data	fall.output.data

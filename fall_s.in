@@ -10,8 +10,8 @@ atom_modify	map yes
 read_data	fall_s.input.data
 
 # GROUPS
-group		g_fu id 162433:162492
-group		g_si_all id 1:162432
+group		g_fu type 2
+group		g_si_all type 1
 lattice         diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
 region		r_si_center block -11 11 -11 11 -34 0 units lattice
 group		g_si_center region r_si_center
@@ -26,7 +26,7 @@ pair_coeff	* * airebo CH.airebo NULL C
 neighbor	3.0 bin
 
 # COMPUTES
-compute		vOcu g_si_all voronoi/atom occupation
+compute		vOcu g_si_all voronoi/atom occupation only_group
 
 variable	vVacTemp atom "c_vOcu[1]==0"
 compute		vVacTemp g_si_all reduce sum v_vVacTemp
@@ -51,12 +51,13 @@ fix		f_2 g_si_thermostat nvt temp 1e-3 1e-3 $(100.0*dt)
 
 # DUMP
 dump		d_vor g_output custom 20 vor_time.dump v_vVac v_vInt
+dump    d_all all custom 20 all.dump id type x y z
 
 # VELOCITY FU
 velocity	g_fu set NULL NULL -231 sum yes units box
 
 # RUN
-run		50
+run		5000
 
 # LAST 10 STEPS COMPUTES
 variable	c60_z atom "z-v_zeroLVL"

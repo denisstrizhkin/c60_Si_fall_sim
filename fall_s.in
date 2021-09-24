@@ -57,7 +57,7 @@ dump    d_all all custom 20 all.dump id type x y z
 velocity	g_fu set NULL NULL -231 sum yes units box
 
 # RUN
-run		5000
+run		50
 
 # LAST 10 STEPS COMPUTES
 variable	c60_z atom "z-v_zeroLVL"

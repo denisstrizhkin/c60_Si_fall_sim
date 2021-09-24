@@ -26,6 +26,5 @@ echo; echo "$STARS"
 mkdir result
 
 echo "last 10 steps C distribution average calculation"
-c60_dist=$("$SCRIPTS/c60_dist/c60_dist.exe" "$DIR/$DUMP_C_Z")
-echo $c60_dist > "$DIR/result/c60_dist.vals"
+"$SCRIPTS/C_z_dist/C_z_dist.exe" "$DIR/$DUMP_C_Z" "$DIR/result/C_z_dist.vals"
 echo; echo "$STARS"

@@ -35,8 +35,6 @@ void WriteAverageArray(float* average_array, int num_of_carbon,
   for (int i = 0; i < num_of_carbon; i++)
     output_file << average_array[i] << '\n';
 
-  std::cout << num_of_carbon << '\n';
-
   output_file.close();
 }
 
@@ -62,8 +60,7 @@ float* GetAverageArray(std::vector<float>* steps_coordinates_array,
 int GetNumOfCarbon(std::vector<float>* steps_coordinates_array)
 {
   int num_of_carbon = steps_coordinates_array[0].size();
-  std::cout << steps_coordinates_array[0].size() << '\n';
-
+ 
   for (int i = 1; i < kNumOfSteps; i++)
   {
     num_of_carbon = std::min(num_of_carbon,

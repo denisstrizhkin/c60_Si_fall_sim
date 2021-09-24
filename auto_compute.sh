@@ -8,6 +8,7 @@ STARS="******"
 # dump file names
 DUMP="all.dump"
 DUMP_C_Z="c60_z.dump"
+DUMP_VOR="vor_time.dump"
 # zero level
 ZERO_LVL="-0.0184635"
 
@@ -27,4 +28,8 @@ mkdir result
 
 echo "last 10 steps C distribution average calculation"
 "$SCRIPTS/C_z_dist/C_z_dist.exe" "$DIR/$DUMP_C_Z" "$DIR/result/C_z_dist.vals"
+echo; echo "$STARS"
+
+echo "parsing voronoi time relation dump"
+"$SCRIPTS/Voro_time/Voro_time.exe" "$DIR/$DUMP_VOR" "$DIR/result/Voro_time.vals"
 echo; echo "$STARS"

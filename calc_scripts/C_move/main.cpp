@@ -70,7 +70,7 @@ std::string* ReadLines(char* input_file_path, int num_of_lines)
   input_file.open(input_file_path);
   while(std::getline(input_file, line))
   {
-    lines_array[current_line++]; 
+    lines_array[current_line++] = line; 
   }
   input_file.close();
 

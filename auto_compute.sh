@@ -41,7 +41,7 @@ do
   
   # run lammps script
   echo "running lammps script"; echo " ---"
-  lmp -sf omp -in fall_s.in
+  lmp -sf omp -in fall.in
   echo; echo "$STARS"
   
   # parse carbon z distribution dump

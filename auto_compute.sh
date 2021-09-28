@@ -32,7 +32,7 @@ rm -rf result
 mkdir result
 
 # variants loop
-for i in {1..3}
+for i in {1..5}
 do
   echo "compute: moved$i"; echo; echo "$STARS"
 

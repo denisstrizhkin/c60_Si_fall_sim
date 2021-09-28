@@ -58,7 +58,7 @@ dump  d_all all custom 20 all.dump id type x y z
 velocity  g_fu set NULL NULL v_carbon_speed_down sum yes units box
 
 # RUN
-run 50
+run 5000
 
 # LAST 10 STEPS COMPUTES
 variable  c60_z atom "z-v_zero_lvl"

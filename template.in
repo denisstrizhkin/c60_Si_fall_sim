@@ -2,6 +2,8 @@
 variable zero_lvl equal "-0.0184635"
 variable carbon_speed_down equal "-231"
 
+variable num_of_c equal "60"
+
 # INIT
 units       metal
 dimension   3
@@ -37,7 +39,7 @@ variable  vIntTemp1 atom "c_vOcu[1]*(c_vOcu[1]>1)"
 variable  vIntTemp2 atom "c_vOcu[1]>1"
 variable  vIntTemp3 atom "v_vIntTemp1-v_vIntTemp2"
 compute   vIntTemp3 g_si_all reduce sum v_vIntTemp3
-variable  vInt atom "c_vIntTemp3"
+variable  vInt atom "c_vIntTemp3-v_num_of_c"
 
 # THERMO
 reset_timestep 0
@@ -58,7 +60,7 @@ dump  d_all all custom 20 all.dump id type x y z
 velocity  g_fu set NULL NULL v_carbon_speed_down sum yes units box
 
 # RUN
-run 5000
+run 50
 
 # LAST 10 STEPS COMPUTES
 variable  c60_z atom "z-v_zero_lvl"

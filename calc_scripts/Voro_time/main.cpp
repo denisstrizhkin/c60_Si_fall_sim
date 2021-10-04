@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <vector>
 
 // *** FUNCTIONS ***
 
@@ -11,6 +12,7 @@ void WriteAverageArray(std::string* steps_array, int num_of_steps,
   char* output_file_path);
 // count steps in a lammps dump file
 int CountSteps(char* input_file_path);
+std::vector<std::string> SplitString(const std::string& line);
 
 // ***
 
@@ -26,6 +28,18 @@ int main(int argc, char** argv)
   WriteAverageArray(steps_array, num_of_steps, argv[2]);
 }
 
+std::vector<std::string> SplitString(const std::string& line)
+{
+  std::vector<std::string> line_strs;
+  std::stringstream line_stream(line);
+  std::string str;
+
+  while (std::getline(line_stream, str, ' '))
+    line_strs.push_back(str);
+  
+  return line_strs;
+}
+
 void WriteAverageArray(std::string* steps_array, int num_of_steps,
   char* output_file_path)
 {
@@ -34,18 +48,14 @@ void WriteAverageArray(std::string* steps_array, int num_of_steps,
   output_file.open(output_file_path);
 
   output_file << "timestep vacs ints\n";
-  for (int i = 0; i < num_of_steps; i++)
+  for (size_t i = 0; i < num_of_steps; i++)
   {
-    int space_pos = steps_array[i].find(' ');
+    std::vector<std::string> line_strs = SplitString(steps_array[i]);
 
-    std::string str1 = steps_array[i].substr(0, space_pos);
-    std::string str2 = steps_array[i].substr(space_pos + 1);
-
-    space_pos = str2.find(' ');
-
-    output_file << std::setw(10) << std::left << str1
-      << std::setw(10) << std::left << str2.substr(0, space_pos)
-      <<str2.substr(space_pos + 1) << '\n';
+    output_file << std::setw(10) << std::left << line_strs[0];
+    for (size_t i = 1; i < line_strs.size(); i++)
+      output_file << std::setw(10) << std::left << line_strs[i];
+    output_file << '\n';
   }
 
   output_file.close();

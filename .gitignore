@@ -1,5 +1,5 @@
 *.dump
 result
 log.lammps
-fall.output.data
+fall*
 *.exe

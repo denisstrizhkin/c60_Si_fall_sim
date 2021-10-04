@@ -3,6 +3,8 @@ variable zero_lvl equal "-0.0184635"
 variable carbon_speed_down equal "-231"
 
 variable num_of_c equal "60"
+variable z_coord_threshold equal "12"
+variable z_speed_threshold equal "0.5"
 
 # INIT
 units       metal
@@ -40,6 +42,8 @@ variable  vIntTemp2 atom "c_vOcu[1]>1"
 variable  vIntTemp3 atom "v_vIntTemp1-v_vIntTemp2"
 compute   vIntTemp3 g_si_all reduce sum v_vIntTemp3
 variable  vInt atom "c_vIntTemp3-v_num_of_c"
+
+variable  sputter atom "
 
 # THERMO
 reset_timestep 0

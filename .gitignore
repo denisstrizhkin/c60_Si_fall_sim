@@ -3,3 +3,4 @@ result
 log.lammps
 fall*
 *.exe
+fall.input.data

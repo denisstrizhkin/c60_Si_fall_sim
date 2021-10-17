@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 double Dump::AtomValAt(const std::string& key,
     const size_t step, const size_t atom) const
 {
-  return this->steps[step].atoms[atom][this->keys.at(key)];
+  return this->steps.at(step).atoms.at(atom).at(this->keys.at(key));
 }
 
 void WriteOutput(const std::string& output_file_path,

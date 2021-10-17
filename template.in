@@ -53,7 +53,7 @@ reset_timestep 0
 timestep       0.001
 thermo         20
 thermo_style   custom step ke v_interstitials c_sputter_temp2
-thermo_modify  lost ignore
+#thermo_modify  lost ignore
 
 # FIX
 fix f_1 all nve

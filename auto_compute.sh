@@ -2,7 +2,7 @@
 
 # get script directory
 DIR=$(dirname "$0")
-SCRIPTS="$DIR/calc_scripts"
+DATA_PARSER="$DIR/data_parser/data_parser.exe"
 # string for printing stars
 STARS="******"
 # output file name
@@ -47,7 +47,7 @@ do
     mkdir $RESULTS_DIR
     
     echo "moving carbon"
-    "$SCRIPTS/C_move/C_move.exe" "$INPUT_TEMPLATE" "$NEW_INPUT_DATA"
+    "$DATA_PARSER" "r" "$INPUT_TEMPLATE" "$NEW_INPUT_DATA"
     cp $NEW_INPUT_DATA $DIR/$INPUT
     echo; echo "$STARS"
 
@@ -71,12 +71,12 @@ do
     
     # parse carbon z distribution dump
     echo "last 10 steps carbon distribution average calculation"
-    $SCRIPTS/C_z_dist/C_z_dist.exe $DIR/$DUMP_C_Z $RESULTS_DIR/C_z_dist.vals
+    $DATA_PARSER "c" $DIR/$DUMP_C_Z $RESULTS_DIR/C_z_dist.vals
     echo; echo "$STARS"
     
     # parse voro dump
     echo "parsing voronoi time relation dump"
-    $SCRIPTS/Voro_time/Voro_time.exe $DIR/$DUMP_VOR $RESULTS_DIR/Voro_time.vals
+    $DATA_PARSER "v" $DIR/$DUMP_VOR $RESULTS_DIR/Voro_time.vals
     echo; echo "$STARS"
   done
 done

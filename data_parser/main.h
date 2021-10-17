@@ -15,10 +15,11 @@ public:
     const std::vector<std::string>& keys) const;
   Dump GetAverageOfDump() const;
 
-  double AtomValAt(const std::string& key,
+  double& AtomValAt(const std::string& key,
       const size_t step, const size_t atom) const;
   double& AtomValAt(const size_t step,
       const size_t atom, const size_t val) const;
+  void WriteTo(const std::string& output_file_path) const;
   
 private:
   struct Step
@@ -32,3 +33,8 @@ private:
 };
 
 std::vector<std::string> SplitString(const std::string& line);
+void WriteOutput(const std::string& output_file_path,
+    std::vector<std::string> output_vec);
+// C z coord distrib
+void CalcCDistrib(const std::string& dump_file_path,
+    const std::string& output_file_path);

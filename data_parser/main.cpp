@@ -38,9 +38,9 @@ int main(int argc, char** argv)
 }
 
 double Dump::AtomValAt(const std::string& key,
-    const size_t step, const size_t atom)
+    const size_t step, const size_t atom) const
 {
-  return steps[step].atoms[atom][keys[key]];
+  return this->steps[step].atoms[atom][this->keys.at(key)];
 }
 
 void WriteOutput(const std::string& output_file_path,
@@ -64,16 +64,15 @@ std::vector<std::string> SplitString(const std::string& line)
   return line_strs;
 }
 
-Dump ReadDump(const std::string& dump_file_path)
+Dump::Dump(const std::string& dump_file_path)
 {
   std::string line;
   std::ifstream input_file;
-  Dump dump;
-  // loop variables
-  size_t current_step = 0;
-  size_t current_atom;
+   // loop variables
+  size_t current_step = -1;
+  size_t current_atom = 0;
   bool b_analyze_line = true;
-  bool b_keys_read = false;
+  bool b_keys_read = true;
   bool b_read_timestep = false;
   // loop for reading the input file
   input_file.open(dump_file_path);
@@ -84,40 +83,44 @@ Dump ReadDump(const std::string& dump_file_path)
       b_analyze_line = false;
       b_read_timestep = true;
 
-      dump.steps.push_back(Step());
+      this->steps.push_back(Step());
       current_step++;
       size_t current_atom = 0;
     }
     else if (b_read_timestep == true)
     {
-      dump.steps[current_step].time = std::stoul(line);
+      this->steps.at(current_step).time = std::stoul(line);
       b_read_timestep = false;
     }
     else if (line.substr(0, 11) == "ITEM: ATOMS")
     {
       b_analyze_line = true;
-      std::vector<std::string> keys_vec = SplitString(line.substr(12));
-      for (size_t i = 0; i < keys_vec.size(); i++)
-        dump.keys[keys_vec[i]] = i;
+
+      if (b_keys_read == true)
+      {
+        std::vector<std::string> keys_vec = SplitString(line.substr(12));
+        for (size_t i = 0; i < keys_vec.size(); i++)
+          this->keys[keys_vec[i]] = i;
+
+        b_keys_read == false;
+      }
     }
     else if (b_analyze_line == true)
     {
       std::vector<std::string> vals_vec = SplitString(line);
       
-      dump.steps[current_step].atoms.push_back(std::vector<double>());
+      this->steps[current_step].atoms.push_back(std::vector<double>());
       for (std::string value : vals_vec)
-        dump.steps[current_step].
+        this->steps[current_step].
             atoms[current_atom].push_back(std::stod(value));
 
       current_atom++;
     }
   }
   input_file.close();
-
-  return dump;
 }
 
-Dump GetAverageOfDump(const Dump& dump)
+Dump Dump::GetAverageOfDump() const
 {
   Dump new_dump;
   new_dump.keys = dump.keys;
@@ -128,21 +131,23 @@ Dump GetAverageOfDump(const Dump& dump)
 void CalcCDistrib(const std::string& dump_file_path,
     const std::string& output_file_path)
 {
-  Dump dump = ReadDump(dump_file_path);
-  Dump c_z_dump = GetSpecificStepsVals(-1, {"z"}, dump);
-  Dump average_dump = GetAverageOfDump(c_z_dump);
+  Dump dump(dump_file_path);
+  Dump c_z_dump = dump.GetSpecificStepsVals(-1, {"z"});
+  Dump average_dump = c_z_dump.GetAverageOfDump();
   WriteDump(average_dump, output_file_path);
 }
 
-Dump GetSpecificStepsVals(const unsigned type, 
-    const std::vector<std::string>& keys, const Dump& dump)
+Dump Dump::GetSpecificStepsVals(const unsigned type, 
+    const std::vector<std::string>& keys) const
 {
+  // make new dump and copy keys
   Dump new_dump;
   for (std::string key : keys) new_dump.keys.insert({key, 0});
-
-  for (size_t i = 0; i < dump.steps.size(); i++)
+  // cycle through steps
+  for (size_t i = 0; i < this->steps.size(); i++)
   {
     new_dump.steps.push_back(Step());
+    new_dump.steps[i].time = this->steps[i].time;
 
     for (size_t j = 0; j < dump.steps[i].atoms.size(); i++)
     {

@@ -12,8 +12,10 @@ int main(int argc, char** argv)
     switch (argv[1][0])
     {
       case 'r':
+        RandomizeInput(argv[2], argv[3]);
         break;
       case 'v':
+        WriteVoro(argv[2], argv[3]);
         break;
       case 'c':
         CalcCDistrib(argv[2], argv[3]);
@@ -196,6 +198,19 @@ void CalcCDistrib(const std::string& dump_file_path,
   c_z_dump.WriteTo("./d1.vals");
   Dump average_dump = c_z_dump.GetAverageOfDump();
   average_dump.WriteTo(output_file_path);
+}
+
+void RandomizeInput(const std::string& dump_file_path,
+    const std::string& output_file_path)
+{
+
+}
+
+void WriteVoro(const std::string& dump_file_path,
+    const std::string& output_file_path)
+{
+  Dump dump(dump_file_path);
+  dump.WriteTo(output_file_path);
 }
 
 Dump Dump::GetSpecificStepsVals(const short type, 

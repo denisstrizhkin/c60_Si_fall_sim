@@ -43,3 +43,7 @@ void WriteOutput(const std::string& output_file_path,
 // C z coord distrib
 void CalcCDistrib(const std::string& dump_file_path,
     const std::string& output_file_path);
+void WriteVoro(const std::string& dump_file_path,
+    const std::string& output_file_path);
+void RandomizeInput(const std::string& dump_file_path,
+    const std::string& output_file_path);

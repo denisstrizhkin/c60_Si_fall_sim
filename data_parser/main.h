@@ -5,6 +5,8 @@
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <random>
+#include <chrono>
 
 class Dump
 {
@@ -38,8 +40,10 @@ private:
 };
 
 std::vector<std::string> SplitString(const std::string& line);
-void WriteOutput(const std::string& output_file_path,
+void WriteLines(const std::string& output_file_path,
     std::vector<std::string> output_vec);
+std::vector<std::string> ReadLines(const std::string& input_file_path);
+void MoveAtoms(std::vector<std::string>& lines_vector, const size_t type);
 // C z coord distrib
 void CalcCDistrib(const std::string& dump_file_path,
     const std::string& output_file_path);

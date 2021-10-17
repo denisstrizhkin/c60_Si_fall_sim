@@ -1,5 +1,9 @@
 #include "main.h"
 
+const double kBlockSize = 5.43;
+const size_t kX = 2;
+const size_t kY = 3;
+
 int main(int argc, char** argv)
 {
   if (argc != 4)
@@ -80,7 +84,20 @@ void Dump::WriteTo(const std::string& output_file_path) const
   output_file.close();
 }
 
-void WriteOutput(const std::string& output_file_path,
+std::vector<std::string> ReadLines(const std::string& input_file_path)
+{
+  std::vector<std::string> lines_vec;
+  std::ifstream input_file;
+  std::string line;
+  // read input file lines cycle
+  input_file.open(input_file_path);
+  while(std::getline(input_file, line)) lines_vec.push_back(line);
+  input_file.close();
+
+  return lines_vec;
+}
+
+void WriteLines(const std::string& output_file_path,
     std::vector<std::string> output_vec)
 {
   std::ofstream output_file;
@@ -88,6 +105,47 @@ void WriteOutput(const std::string& output_file_path,
   for (std::string line : output_vec) output_file << line << '\n';
   output_file.close();
 } 
+
+double RandomizeCoordinate()
+{  
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  std::default_random_engine random_engine(seed);
+  std::uniform_real_distribution<double> uniform_double_distrib(-0.5, 0.5);
+  
+  return uniform_double_distrib(random_engine) * kBlockSize;
+}
+
+void MoveAtoms(std::vector<std::string>& lines_vec, const size_t type)
+{
+  int temp = 0;
+
+  double delta_x = RandomizeCoordinate();
+  double delta_y = RandomizeCoordinate();
+ 
+  for (size_t i = 16; i < lines_vec.size(); i++)
+  {
+    if (lines_vec[i].size() == 0) break;
+    std::vector<std::string> line_vals = SplitString(lines_vec[i]);
+
+    if (line_vals[type] == "2")
+    {
+      std::cout << "in coord change function " << temp++;
+      std::cout << " " << line_vals[kX] << " " << line_vals[kY];
+
+      line_vals[kX] = std::to_string(std::stod(line_vals[kX]) + delta_x);
+      line_vals[kY] = std::to_string(std::stod(line_vals[kY]) + delta_y); 
+   
+      std::cout << " " << line_vals[kX] << " " << line_vals[kY] << '\n';
+
+      std::string new_line = line_vals[0];
+
+      for (size_t j = 1; j < line_vals.size(); j++)
+        new_line += ' ' + line_vals[j];
+
+      lines_vec[i] = new_line;
+    }
+  }
+}
 
 std::vector<std::string> SplitString(const std::string& line)
 {
@@ -200,10 +258,12 @@ void CalcCDistrib(const std::string& dump_file_path,
   average_dump.WriteTo(output_file_path);
 }
 
-void RandomizeInput(const std::string& dump_file_path,
+void RandomizeInput(const std::string& input_file_path,
     const std::string& output_file_path)
 {
-
+  std::vector<std::string> lines_vector = ReadLines(input_file_path);
+  MoveAtoms(lines_vector, 1);
+  WriteLines(output_file_path, lines_vector);
 }
 
 void WriteVoro(const std::string& dump_file_path,

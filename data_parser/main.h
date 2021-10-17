@@ -17,6 +17,8 @@ public:
 
   double AtomValAt(const std::string& key,
       const size_t step, const size_t atom) const;
+  double AtomValAt(const size_t step,
+      const size_t atom, const size_t val) const;
   
 private:
   struct Step

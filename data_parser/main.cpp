@@ -29,12 +29,24 @@ int main(int argc, char** argv)
 }
 
 double& Dump::AtomValAt(const std::string& key,
-    const size_t step, const size_t atom) const
+    const size_t step, const size_t atom)
 {
   return this->steps.at(step).atoms.at(atom).at(this->keys.at(key));
 }
 
 double& Dump::AtomValAt(const size_t step,
+    const size_t atom, const size_t val)
+{
+  return this->steps.at(step).atoms.at(atom).at(val);
+}
+
+double Dump::AtomValAt(const std::string& key,
+    const size_t step, const size_t atom) const
+{
+  return this->steps.at(step).atoms.at(atom).at(this->keys.at(key));
+}
+
+double Dump::AtomValAt(const size_t step,
     const size_t atom, const size_t val) const
 {
   return this->steps.at(step).atoms.at(atom).at(val);

@@ -9,7 +9,7 @@
 class Dump
 {
 public:
-  Dump();
+  Dump() {};
   Dump(const std::string& dump_file_path);
 
   Dump GetSpecificStepsVals(const unsigned type,
@@ -17,8 +17,12 @@ public:
   Dump GetAverageOfDump() const;
 
   double& AtomValAt(const std::string& key,
-      const size_t step, const size_t atom) const;
+      const size_t step, const size_t atom);
   double& AtomValAt(const size_t step,
+      const size_t atom, const size_t val);
+  double AtomValAt(const std::string& key,
+      const size_t step, const size_t atom) const;
+  double AtomValAt(const size_t step,
       const size_t atom, const size_t val) const;
   void WriteTo(const std::string& output_file_path) const;
   

@@ -60,23 +60,24 @@ double Dump::AtomValAt(const size_t step,
 
 void Dump::WriteTo(const std::string& output_file_path) const
 {
+  const unsigned kWidth = 15;
   std::ofstream output_file;
   output_file.open(output_file_path);
   // write header
-  output_file << std::setw(10) << std::left << "step";
+  output_file << std::setw(kWidth) << std::left << "step";
   for (auto key : this->keys)
-    output_file << std::setw(10) << std::left << key.first;
+    output_file << std::setw(kWidth) << std::left << key.first;
   output_file << '\n';  
   // write steps
   for (Step step : this->steps)
   {
     for (size_t i = 0; i < step.atoms.size(); i++)
     {
-      if (i == 0) output_file << std::setw(10) << std::left << step.time;
-      else output_file << std::setw(10) << std::left << ' ';
+      if (i == 0) output_file << std::setw(kWidth) << std::left << step.time;
+      else output_file << std::setw(kWidth) << std::left << ' ';
       // write atom vals
       for (double value : step.atoms.at(i))
-        output_file << std::setw(10) << std::left << value;
+        output_file << std::setw(kWidth) << std::left << value;
 
       output_file << '\n';
     }

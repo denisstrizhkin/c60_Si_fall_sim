@@ -20,6 +20,7 @@ DUMP_ALL=all.dump
 DUMP_LAST10=last_10.dump
 DUMP_LAST_STEP=last_step.dump
 DUMP_VOR=vor_time.dump
+DUMP_C_Z=c_z.dump
 # zero level
 ZERO_LVL="-0.0184635"
 # computes speeds
@@ -66,6 +67,7 @@ do
     lmp -sf omp -in fall.in
     cp $DIR/$OUTPUT $RESULTS_DIR/$OUTPUT
     cp $DIR/$IN $RESULTS_DIR/$IN
+    cp $DIR/$DUMP_C_Z $RESULTS_DIR/$DUMP_C_Z
     cp $DIR/$DUMP_LAST_STEP $RESULTS_DIR/$DUMP_LAST_STEP
     cp $DIR/$DUMP_LAST10 $RESULTS_DIR/$DUMP_LAST10
     cp $DIR/$DUMP_ALL $RESULTS_DIR/$DUMP_ALL
@@ -76,7 +78,7 @@ do
     
     # parse carbon z distribution dump
     echo "last 10 steps carbon distribution average calculation"
-    $DATA_PARSER "c" $DIR/$DUMP_LAST10 $RESULTS_DIR/C_z_dist.vals
+    $DATA_PARSER "c" $DIR/$DUMP_C_Z $RESULTS_DIR/C_z_dist.vals
     echo; echo "$STARS"
     
     # parse voro dump

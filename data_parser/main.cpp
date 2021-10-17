@@ -252,7 +252,7 @@ void CalcCDistrib(const std::string& dump_file_path,
 {
   Dump dump(dump_file_path);
   dump.WriteTo("./d0.vals");
-  Dump c_z_dump = dump.GetSpecificStepsVals(-1, {"v_c60_z"});
+  Dump c_z_dump = dump.GetSpecificStepsVals(-1, {"v_c_z_dist"});
   c_z_dump.WriteTo("./d1.vals");
   Dump average_dump = c_z_dump.GetAverageOfDump();
   average_dump.WriteTo(output_file_path);

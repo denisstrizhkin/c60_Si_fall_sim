@@ -12,7 +12,7 @@ public:
   Dump() {};
   Dump(const std::string& dump_file_path);
 
-  Dump GetSpecificStepsVals(const unsigned type,
+  Dump GetSpecificStepsVals(const short type,
     const std::vector<std::string>& keys) const;
   Dump GetAverageOfDump() const;
 

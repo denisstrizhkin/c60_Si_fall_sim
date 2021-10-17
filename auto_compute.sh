@@ -47,7 +47,7 @@ do
     mkdir $RESULTS_DIR
     
     echo "moving carbon"
-    "$DATA_PARSER" "r" "$INPUT_TEMPLATE" "$NEW_INPUT_DATA"
+    $DATA_PARSER 'r' $INPUT_TEMPLATE $NEW_INPUT_DATA
     cp $NEW_INPUT_DATA $DIR/$INPUT
     echo; echo "$STARS"
 

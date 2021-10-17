@@ -98,7 +98,7 @@ Dump::Dump(const std::string& dump_file_path)
       {
         std::vector<std::string> keys_vec = SplitString(line.substr(12));
         for (size_t i = 0; i < keys_vec.size(); i++)
-          this->keys[keys_vec[i]] = i;
+          this->keys.at(keys_vec.at(i)) = i;
 
         b_keys_read == false;
       }
@@ -107,10 +107,10 @@ Dump::Dump(const std::string& dump_file_path)
     {
       std::vector<std::string> vals_vec = SplitString(line);
       
-      this->steps[current_step].atoms.push_back(std::vector<double>());
+      this->steps.at(current_step).atoms.push_back(std::vector<double>());
       for (std::string value : vals_vec)
-        this->steps[current_step].
-            atoms[current_atom].push_back(std::stod(value));
+        this->steps.at(current_step).
+            atoms.at(current_atom).push_back(std::stod(value));
 
       current_atom++;
     }

@@ -6,8 +6,6 @@ void WriteOutput(const std::string& output_file_path,
 // C z coord distrib
 void CalcCDistrib(const std::string& dump_file_path,
     const std::string& output_file_path);
-std::vector<double> GetAverageVec(
-    std::vector<std::vector<double>> steps_coords_vec);
 
 int main(int argc, char** argv)
 {
@@ -171,23 +169,4 @@ Dump Dump::GetSpecificStepsVals(const unsigned type,
   }
 
   return new_dump;
-}
-
-std::vector<double> GetAverageVec(
-    std::vector<std::vector<double>> steps_coords_vec)
-{
-  std::vector<double> average_vec;
-
-  for (const double value : steps_coords_vec[0])
-    average_vec.push_back(value);
-
-  for (size_t i = 0; i < average_vec.size(); i++)
-  {
-    for (size_t j = 1; j < steps_coords_vec.size(); j++)
-      average_vec[i] += steps_coords_vec[j][i];
-
-    average_vec[i] /= steps_coords_vec.size();
-  }
-
-  return average_vec;
 }

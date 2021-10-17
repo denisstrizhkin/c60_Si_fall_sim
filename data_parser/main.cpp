@@ -120,7 +120,7 @@ Dump::Dump(const std::string& dump_file_path)
 
       this->steps.push_back(Step());
       current_step++;
-      size_t current_atom = 0;
+      current_atom = 0;
     }
     else if (b_read_timestep == true)
     {
@@ -135,7 +135,7 @@ Dump::Dump(const std::string& dump_file_path)
       {
         std::vector<std::string> keys_vec = SplitString(line.substr(12));
         for (size_t i = 0; i < keys_vec.size(); i++)
-          this->keys.at(keys_vec.at(i)) = i;
+          this->keys.insert({keys_vec.at(i), i}); 
 
         b_keys_read == false;
       }
@@ -191,12 +191,14 @@ void CalcCDistrib(const std::string& dump_file_path,
     const std::string& output_file_path)
 {
   Dump dump(dump_file_path);
-  Dump c_z_dump = dump.GetSpecificStepsVals(-1, {"z"});
+  dump.WriteTo("./d0.vals");
+  Dump c_z_dump = dump.GetSpecificStepsVals(-1, {"v_c60_z"});
+  c_z_dump.WriteTo("./d1.vals");
   Dump average_dump = c_z_dump.GetAverageOfDump();
-  c_z_dump.WriteTo(output_file_path);
+  average_dump.WriteTo(output_file_path);
 }
 
-Dump Dump::GetSpecificStepsVals(const unsigned type, 
+Dump Dump::GetSpecificStepsVals(const short type, 
     const std::vector<std::string>& keys) const
 {
   // make new dump and copy keys
@@ -212,7 +214,8 @@ Dump Dump::GetSpecificStepsVals(const unsigned type,
     {
       size_t current_atom = 0;
       // check if atom type satisfies type argument
-      if (this->AtomValAt("type", i, j) == type || type == -1)
+      short tmp_type = (type == -1 ? -1 : this->AtomValAt("type", i, j));
+      if (tmp_type == type || type == -1)
       {
         new_dump.steps.at(i).atoms.push_back(std::vector<double>());
 

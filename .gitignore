@@ -1,4 +1,6 @@
 *.dump
+*.vals
+main
 result
 log.lammps
 fall*

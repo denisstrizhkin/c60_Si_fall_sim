@@ -1,12 +1,5 @@
 #include "main.h"
 
-void WriteOutput(const std::string& output_file_path,
-    std::vector<std::string> output_vec);
-
-// C z coord distrib
-void CalcCDistrib(const std::string& dump_file_path,
-    const std::string& output_file_path);
-
 int main(int argc, char** argv)
 {
   if (argc != 4)
@@ -35,7 +28,7 @@ int main(int argc, char** argv)
   return 0;
 }
 
-double Dump::AtomValAt(const std::string& key,
+double& Dump::AtomValAt(const std::string& key,
     const size_t step, const size_t atom) const
 {
   return this->steps.at(step).atoms.at(atom).at(this->keys.at(key));
@@ -45,6 +38,32 @@ double& Dump::AtomValAt(const size_t step,
     const size_t atom, const size_t val) const
 {
   return this->steps.at(step).atoms.at(atom).at(val);
+}
+
+void Dump::WriteTo(const std::string& output_file_path) const
+{
+  std::ofstream output_file;
+  output_file.open(output_file_path);
+  // write header
+  output_file << std::setw(10) << std::left << "step";
+  for (auto key : this->keys)
+    output_file << std::setw(10) << std::left << key.first;
+  output_file << '\n';  
+  // write steps
+  for (Step step : this->steps)
+  {
+    for (size_t i = 0; i < step.atoms.size(); i++)
+    {
+      if (i == 0) output_file << std::setw(10) << std::left << step.time;
+      else output_file << std::setw(10) << std::left << ' ';
+      // write atom vals
+      for (double value : step.atoms.at(i))
+        output_file << std::setw(10) << std::left << value;
+
+      output_file << '\n';
+    }
+  }
+  output_file.close();
 }
 
 void WriteOutput(const std::string& output_file_path,
@@ -162,7 +181,7 @@ void CalcCDistrib(const std::string& dump_file_path,
   Dump dump(dump_file_path);
   Dump c_z_dump = dump.GetSpecificStepsVals(-1, {"z"});
   Dump average_dump = c_z_dump.GetAverageOfDump();
-  WriteDump(average_dump, output_file_path);
+  c_z_dump.WriteTo(output_file_path);
 }
 
 Dump Dump::GetSpecificStepsVals(const unsigned type, 

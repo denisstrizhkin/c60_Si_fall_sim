@@ -145,22 +145,22 @@ Dump Dump::GetSpecificStepsVals(const unsigned type,
   for (size_t i = 0; i < this->steps.size(); i++)
   {
     new_dump.steps.push_back(Step());
-    new_dump.steps[i].time = this->steps[i].time;
-
-    for (size_t j = 0; j < dump.steps[i].atoms.size(); i++)
+    new_dump.steps.at(i).time = this->steps.at(i).time;
+    // cycle through atoms of i_step
+    for (size_t j = 0; j < this->steps.at(i).atoms.size(); j++)
     {
       size_t current_atom = 0;
-
-      if (dump.AtomValAt("type", i, j) == type || type == -1)
+      // check if atom type satisfies type argument
+      if (this->AtomValAt("type", i, j) == type || type == -1)
       {
-        new_dump.steps[i].atoms.push_back(std::vector<double>());
+        new_dump.steps.at(i).atoms.push_back(std::vector<double>());
 
         size_t current_val = 0;
         for (std::string key : keys)
         {
-          new_dump.keys[key] = current_val++;
-          new_dump.steps[i].atoms[current_atom].push_back(
-              dump.AtomValAt(key, i, j));
+          new_dump.keys.at(key) = current_val++;
+          new_dump.steps.at(i).atoms.at(current_atom).push_back(
+              this->AtomValAt(key, i, j));
         }
 
         current_atom++;
@@ -170,3 +170,4 @@ Dump Dump::GetSpecificStepsVals(const unsigned type,
 
   return new_dump;
 }
+

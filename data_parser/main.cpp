@@ -41,6 +41,12 @@ double Dump::AtomValAt(const std::string& key,
   return this->steps.at(step).atoms.at(atom).at(this->keys.at(key));
 }
 
+double& Dump::AtomValAt(const size_t step,
+    const size_t atom, const size_t val) const
+{
+  return this->steps.at(step).atoms.at(atom).at(val);
+}
+
 void WriteOutput(const std::string& output_file_path,
     std::vector<std::string> output_vec)
 {
@@ -121,9 +127,33 @@ Dump::Dump(const std::string& dump_file_path)
 Dump Dump::GetAverageOfDump() const
 {
   Dump new_dump;
-  new_dump.keys = dump.keys;
+  new_dump.keys = this->keys;
   new_dump.steps.push_back(Step());
-  
+  new_dump.steps.at(0).time = this->steps.at(0).time;
+  // populate step 0 atoms vector
+  for (size_t i = 0; i < this->steps.at(0).atoms.size(); i++)
+  {
+    new_dump.steps.at(0).atoms.push_back(std::vector<double>());
+    for (size_t j = 0; j < this->steps.at(0).atoms.at(0).size(); j++)
+    {
+      new_dump.steps.at(0).atoms.at(i).push_back(0);
+    } 
+  }
+  // cycle through atoms
+  for (size_t i = 0; i < new_dump.steps.at(0).atoms.size(); i++)
+  {
+    // cycle through steps
+    for (size_t j = 0; j < this->steps.size(); j++)
+    {
+      for (size_t k = 0; k < this->steps.at(j).atoms.at(i).size(); k++)
+        new_dump.AtomValAt(0, i, k) += this->AtomValAt(j, i, k);
+    }
+
+    for (size_t k = 0; k < new_dump.steps.at(0).atoms.at(i).size(); k++)
+        new_dump.AtomValAt(0, i, k) /= this->steps.size();
+  }
+
+  return new_dump;
 }
 
 void CalcCDistrib(const std::string& dump_file_path,

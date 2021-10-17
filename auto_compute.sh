@@ -5,6 +5,8 @@ DIR=$(dirname "$0")
 DATA_PARSER="$DIR/data_parser/data_parser.exe"
 # string for printing stars
 STARS="******"
+# log file name
+LOG=log.lammps
 # output file name
 OUTPUT=fall.output.data
 # in file name
@@ -15,7 +17,8 @@ INPUT_TEMPLATE=template.input.data
 INPUT=fall.input.data
 # dump file names
 DUMP_ALL=all.dump
-DUMP_C_Z=c60_z.dump
+DUMP_LAST10=last_10.dump
+DUMP_LAST_STEP=last_step.dump
 DUMP_VOR=vor_time.dump
 # zero level
 ZERO_LVL="-0.0184635"
@@ -53,7 +56,7 @@ do
 
     echo "changing .in file"
     echo "# CONSTANTS" > $DIR/$IN
-    echo 'variable zero_lvl equal "-0.0184635"' >> $DIR/$IN 
+    echo 'variable zero_lvl equal "'$ZERO_LVL'"' >> $DIR/$IN 
     echo 'variable carbon_speed_down equal "'-${speed_i}'"' >> $DIR/$IN
     awk "NR >= 4" $DIR/$IN_TEMPLATE >> $DIR/$IN
     echo; echo "$STARS"
@@ -63,15 +66,17 @@ do
     lmp -sf omp -in fall.in
     cp $DIR/$OUTPUT $RESULTS_DIR/$OUTPUT
     cp $DIR/$IN $RESULTS_DIR/$IN
-    cp $DIR/$DUMP_C_Z $RESULTS_DIR/$DUMP_C_Z
+    cp $DIR/$DUMP_LAST_STEP $RESULTS_DIR/$DUMP_LAST_STEP
+    cp $DIR/$DUMP_LAST10 $RESULTS_DIR/$DUMP_LAST10
     cp $DIR/$DUMP_ALL $RESULTS_DIR/$DUMP_ALL
     cp $DIR/$DUMP_VOR $RESULTS_DIR/$DUMP_VOR
+    cp $DIR/$LOG $RESULTS_DIR/$LOG
     rm $DIR/$INPUT
     echo; echo "$STARS"
     
     # parse carbon z distribution dump
     echo "last 10 steps carbon distribution average calculation"
-    $DATA_PARSER "c" $DIR/$DUMP_C_Z $RESULTS_DIR/C_z_dist.vals
+    $DATA_PARSER "c" $DIR/$DUMP_LAST10 $RESULTS_DIR/C_z_dist.vals
     echo; echo "$STARS"
     
     # parse voro dump

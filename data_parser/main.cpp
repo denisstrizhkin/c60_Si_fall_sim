@@ -285,10 +285,10 @@ Dump Dump::GetSpecificStepsVals(const short type,
   {
     new_dump.steps.push_back(Step());
     new_dump.steps.at(i).time = this->steps.at(i).time;
+    size_t current_atom = 0;
     // cycle through atoms of i_step
     for (size_t j = 0; j < this->steps.at(i).atoms.size(); j++)
     {
-      size_t current_atom = 0;
       // check if atom type satisfies type argument
       short tmp_type = (type == -1 ? -1 : this->AtomValAt("type", i, j));
       if (tmp_type == type || type == -1)

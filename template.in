@@ -1,6 +1,7 @@
 # CONSTANTS
 variable zero_lvl equal "-0.0184635"
-variable carbon_speed_down equal "-231"
+variable carbon_vz equal "-231"
+variable carbon_vx equal "0"
 
 variable num_of_c equal "60"
 variable z_coord_threshold equal "12"
@@ -84,7 +85,7 @@ dump  d_vor g_output custom 20 vor_time.dump v_vacancies v_sputter_all &
 dump  d_all all custom 20 all.dump id type x y z vx vy vz c_atom_ke
 
 # VELOCITY FU
-velocity  g_fu set NULL NULL v_carbon_speed_down sum yes units box
+velocity  g_fu set v_carbon_vx NULL v_carbon_vz sum yes units box
 
 # RUN
 run 50

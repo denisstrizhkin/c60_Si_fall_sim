@@ -196,9 +196,11 @@ Dump::Dump(const std::string& dump_file_path)
       std::vector<std::string> vals_vec = SplitString(line);
       
       this->steps.at(current_step).atoms.push_back(std::vector<double>());
-      for (std::string value : vals_vec)
-        this->steps.at(current_step).
-            atoms.at(current_atom).push_back(std::stod(value));
+      for (size_t i = 0; i < vals_vec.size(); i++)
+        this->steps.at(current_step).atoms.at(current_atom).push_back(0);
+      for (auto pair : keys)
+        this->steps.at(current_step).atoms.at(current_atom)
+            .at(pair.second) = std::stod(vals_vec[pair.second]);
 
       current_atom++;
     }
@@ -222,18 +224,18 @@ Dump Dump::GetAverageOfDump() const
     } 
   }
   // cycle through atoms
-  for (size_t i = 0; i < new_dump.steps.at(0).atoms.size(); i++)
+  for (size_t atom_i = 0; atom_i < new_dump.steps.at(0).atoms.size(); atom_i++)
   {
     // cycle through steps
-    for (size_t j = 0; j < this->steps.size(); j++)
+    for (size_t step_i = 0; step_i < this->steps.size(); step_i++)
     {
       for (auto pair : new_dump.keys)
-        new_dump.AtomValAt(pair.first, 0, i) +=
-          this->AtomValAt(pair.first, j, i);
+        new_dump.AtomValAt(pair.first, 0, atom_i) +=
+          this->AtomValAt(pair.first, step_i, atom_i);
     }
 
-    for (size_t k = 0; k < new_dump.steps.at(0).atoms.at(i).size(); k++)
-        new_dump.AtomValAt(0, i, k) /= this->steps.size();
+    for (auto pair : new_dump.keys)
+        new_dump.AtomValAt(pair.first, 0, atom_i) /= this->steps.size();
   }
 
   return new_dump;
@@ -244,7 +246,7 @@ void CalcCDistrib(const std::string& dump_file_path,
 {
   Dump dump(dump_file_path);
   dump.WriteTo("./d0.vals");
-  Dump c_z_dump = dump.GetSpecificStepsVals(-1, {"v_c_z_dist"});
+  Dump c_z_dump = dump.GetSpecificStepsVals(2, {"v_c_z_dist"});
   c_z_dump.WriteTo("./d1.vals");
   Dump average_dump = c_z_dump.GetAverageOfDump();
   average_dump.WriteTo(output_file_path);

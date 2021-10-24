@@ -98,8 +98,7 @@ variable  c_z_dist atom "z-v_zero_lvl"
 # LAST 10 STEPS DUMPS
 undump  d_last_step
 dump    d_last10 all custom 5 last_10.dump id type x y z vx vy vz &
-    v_is_sputtered
-dump    d_c_z g_fu custom 5 c_z.dump v_c_z_dist
+    v_is_sputtered v_c_z_dist
 
 # RUN LAST 10
 run 50

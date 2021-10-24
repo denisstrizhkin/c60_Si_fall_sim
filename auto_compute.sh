@@ -20,11 +20,10 @@ DUMP_ALL=all.dump
 DUMP_LAST10=last_10.dump
 DUMP_LAST_STEP=last_step.dump
 DUMP_VOR=vor_time.dump
-DUMP_C_Z=c_z.dump
 # zero level
 ZERO_LVL="-0.0184635"
 # computes speeds
-SPEEDS=("115.7" "163.6" "231.4")
+SPEEDS=("115.7" "163.6" "231.4" "283.4" "365.88")
 
 # print title
 echo "### LAMMPS AUTOCOMPUTE SCRIPT ###"; echo; echo "$STARS"
@@ -65,20 +64,24 @@ do
     # run lammps script
     echo "running lammps script"; echo " ---"
     lmp -sf omp -in fall.in
+    # cp output.data
     cp $DIR/$OUTPUT $RESULTS_DIR/$OUTPUT
-    cp $DIR/$IN $RESULTS_DIR/$IN
-    cp $DIR/$DUMP_C_Z $RESULTS_DIR/$DUMP_C_Z
+    # cp .in file
+    cp $DIR/$IN $RESULTS_DIR/$IN 
+    # cp dumps
     cp $DIR/$DUMP_LAST_STEP $RESULTS_DIR/$DUMP_LAST_STEP
     cp $DIR/$DUMP_LAST10 $RESULTS_DIR/$DUMP_LAST10
     cp $DIR/$DUMP_ALL $RESULTS_DIR/$DUMP_ALL
     cp $DIR/$DUMP_VOR $RESULTS_DIR/$DUMP_VOR
+    # cp log.lammps
     cp $DIR/$LOG $RESULTS_DIR/$LOG
+    # cp input.data
     rm $DIR/$INPUT
     echo; echo "$STARS"
     
     # parse carbon z distribution dump
     echo "last 10 steps carbon distribution average calculation"
-    $DATA_PARSER "c" $DIR/$DUMP_C_Z $RESULTS_DIR/C_z_dist.vals
+    $DATA_PARSER "c" $DIR/$DUMP_LAST10 $RESULTS_DIR/C_z_dist.vals
     echo; echo "$STARS"
     
     # parse voro dump

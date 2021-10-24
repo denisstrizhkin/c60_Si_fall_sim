@@ -20,12 +20,9 @@ public:
 
   double& AtomValAt(const std::string& key,
       const size_t step, const size_t atom);
-  double& AtomValAt(const size_t step,
-      const size_t atom, const size_t val);
   double AtomValAt(const std::string& key,
       const size_t step, const size_t atom) const;
-  double AtomValAt(const size_t step,
-      const size_t atom, const size_t val) const;
+
   void WriteTo(const std::string& output_file_path) const;
   
 private:

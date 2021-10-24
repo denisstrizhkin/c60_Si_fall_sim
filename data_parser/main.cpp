@@ -40,22 +40,10 @@ double& Dump::AtomValAt(const std::string& key,
   return this->steps.at(step).atoms.at(atom).at(this->keys.at(key));
 }
 
-double& Dump::AtomValAt(const size_t step,
-    const size_t atom, const size_t val)
-{
-  return this->steps.at(step).atoms.at(atom).at(val);
-}
-
 double Dump::AtomValAt(const std::string& key,
     const size_t step, const size_t atom) const
 {
   return this->steps.at(step).atoms.at(atom).at(this->keys.at(key));
-}
-
-double Dump::AtomValAt(const size_t step,
-    const size_t atom, const size_t val) const
-{
-  return this->steps.at(step).atoms.at(atom).at(val);
 }
 
 void Dump::WriteTo(const std::string& output_file_path) const
@@ -69,15 +57,17 @@ void Dump::WriteTo(const std::string& output_file_path) const
     output_file << std::setw(kWidth) << std::left << key.first;
   output_file << '\n';  
   // write steps
-  for (Step step : this->steps)
+  for (size_t stp_i = 0; stp_i < this->steps.size(); stp_i++)
   {
-    for (size_t i = 0; i < step.atoms.size(); i++)
+    for (size_t atom_i = 0; atom_i < this->steps[stp_i].atoms.size(); atom_i++)
     {
-      if (i == 0) output_file << std::setw(kWidth) << std::left << step.time;
+      if (atom_i == 0) output_file << std::setw(kWidth)
+          << std::left << this->steps[stp_i].time;
       else output_file << std::setw(kWidth) << std::left << ' ';
       // write atom vals
-      for (double value : step.atoms.at(i))
-        output_file << std::setw(kWidth) << std::left << value;
+      for (auto pair : this->keys)
+        output_file << std::setw(kWidth) << std::left << 
+            this->AtomValAt(pair.first, stp_i, atom_i);
 
       output_file << '\n';
     }
@@ -237,8 +227,9 @@ Dump Dump::GetAverageOfDump() const
     // cycle through steps
     for (size_t j = 0; j < this->steps.size(); j++)
     {
-      for (size_t k = 0; k < this->steps.at(j).atoms.at(i).size(); k++)
-        new_dump.AtomValAt(0, i, k) += this->AtomValAt(j, i, k);
+      for (auto pair : new_dump.keys)
+        new_dump.AtomValAt(pair.first, 0, i) +=
+          this->AtomValAt(pair.first, j, i);
     }
 
     for (size_t k = 0; k < new_dump.steps.at(0).atoms.at(i).size(); k++)

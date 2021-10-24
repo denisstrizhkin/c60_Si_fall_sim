@@ -31,6 +31,12 @@ pair_coeff  * * airebo CH.airebo NULL C
 neighbor    3.0 bin
 
 # COMPUTES
+
+# atoms above zero_lvl
+variable is_above_zero_lvl atom "z>v_zero_lvl"
+compute  above_zero_lvl all reduce sum v_is_above_zero_lvl
+
+# voronoi
 compute   voro_occupation g_si_all voronoi/atom occupation only_group
 
 variable  is_vacancy atom "c_voro_occupation[1]==0"
@@ -65,7 +71,7 @@ variable  sys_fe equal "c_sys_pe + c_sys_ke"
 reset_timestep 0
 timestep       0.001
 thermo         20
-thermo_style   custom step c_sys_pe c_sys_ke v_sys_fe
+thermo_style   custom step c_sys_pe c_sys_ke v_sys_fe c_above_zero_lvl
 #thermo_modify  lost ignore
 
 # FIX

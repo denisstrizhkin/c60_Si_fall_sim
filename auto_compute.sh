@@ -57,8 +57,9 @@ do
     echo "changing .in file"
     echo "# CONSTANTS" > $DIR/$IN
     echo 'variable zero_lvl equal "'$ZERO_LVL'"' >> $DIR/$IN 
-    echo 'variable carbon_speed_down equal "'-${speed_i}'"' >> $DIR/$IN
-    awk "NR >= 4" $DIR/$IN_TEMPLATE >> $DIR/$IN
+    echo 'variable carbon_vz equal "'-${speed_i}'"' >> $DIR/$IN
+    echo 'variable carbon_vx equal "'0'"' >> $DIR/$IN
+    awk "NR >= 5" $DIR/$IN_TEMPLATE >> $DIR/$IN
     echo; echo "$STARS"
     
     # run lammps script

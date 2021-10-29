@@ -26,9 +26,9 @@ group   g_output id 1
 
 # POTENTIAL
 pair_style  hybrid airebo 3.0 tersoff/zbl
-pair_coeff  * * tersoff/zbl SiC.tersoff.zbl Si C
+pair_coeff  * * tersoff/zbl potentials/SiC.tersoff.zbl Si C
 pair_coeff  2 2 none
-pair_coeff  * * airebo CH.airebo NULL C
+pair_coeff  * * airebo potentials/CH.airebo NULL C
 neighbor    3.0 bin
 
 # COMPUTES

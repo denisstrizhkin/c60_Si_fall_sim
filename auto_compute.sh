@@ -76,7 +76,7 @@ begin() {
       mkdir $RESULTS_DIR
       
       echo "moving carbon"
-      $DATA_PARSER 'r' $INPUT_TEMPLATE $NEW_INPUT_DATA
+      $DATA_PARSER 'r' $INPUT_TEMPLATE $NEW_INPUT_DATA "temp"
       cp $NEW_INPUT_DATA $DIR/$INPUT
       echo; echo "$STARS"
   
@@ -108,12 +108,12 @@ begin() {
       
       # parse carbon z distribution dump
       echo "last 10 steps carbon distribution average calculation"
-      $DATA_PARSER "c" $DIR/$DUMP_LAST10 $RESULTS_DIR/C_z_dist.vals
+      $DATA_PARSER "c" $DIR/$DUMP_LAST10 $RESULTS_DIR/C_z_dist.vals "temp"
       echo; echo "$STARS"
       
       # parse voro dump
       echo "parsing voronoi time relation dump"
-      $DATA_PARSER "v" $DIR/$DUMP_VOR $RESULTS_DIR/Voro_time.vals
+      $DATA_PARSER "v" $DIR/$DUMP_VOR $RESULTS_DIR/Voro_time.vals "temp"
       echo; echo "$STARS"
 
       #clean temp files

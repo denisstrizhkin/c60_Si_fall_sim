@@ -1,7 +1,9 @@
 #!/bin/bash
 
+
 # get script directory
 DIR=$(dirname "$0")
+RESULT_DIR="$DIR/result"
 TEMPLATE_DIR="$DIR/templates"
 DATA_PARSER="$DIR/lammps_data_parser/lammps_data_parser"
 # string for printing stars
@@ -118,6 +120,41 @@ begin() {
 
       #clean temp files
       clean
+    done
+  done
+}
+
+above_surface() {
+  vals=$RESULT_DIR/above_surface.vals
+  rm -rf $vals
+  touch $vals
+
+  thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
+  thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
+  printf "****************" >> $vals
+  for threshold_i in {0..5}
+  do
+    printf "__%1.1f" ${thresholdss[threshold_i]} >> $vals
+  done
+  echo "" >> $vals
+
+  for speed_i in "${SPEEDS[@]}"
+  do
+    for move_i in {1..5}
+    do
+      printf "m: %2d,a: %3.2f|" $move_i $speed_i >> $vals
+
+      COMPUTE_NAME="moved_${move_i}_speed_${speed_i}"
+      echo "compute: $COMPUTE_NAME"; echo; echo "$STARS"
+  
+      COMPUTE_DIR="$RESULT_DIR/$COMPUTE_NAME"
+      for threshold_i in {0..5}
+      do
+        $DATA_PARSER "u" $COMPUTE_DIR/$DUMP_LAST10 $RESULT_DIR/tmp "${thresholds[threshold_i]}"
+        data=$(cat $RESULT_DIR/tmp)
+        printf "%5d" $data >> $vals
+      done
+      echo "" >> $vals
     done
   done
 }

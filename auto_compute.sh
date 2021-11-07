@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ### PATHS ###
 
@@ -42,12 +42,18 @@ dump_vor="vor_time.dump"
 zero_lvl="-0.0184635"
 
 # computes speeds
-speeds=("115.7" "163.6" "231.4" "283.4" "365.88")
-x_velocities=("79.1" "148.7" "200.4" "227.9")
-z_velocities=("217.4" "177.3" "115.7" "40.2")
+speeds=""
+speeds="${speeds} 115.7"
+speeds="${speeds} 163.6"
+speeds="${speeds} 231.4"
+speeds="${speeds} 283.4"
+speeds="${speeds} 365.88"
+
+#x_velocities=("79.1" "148.7" "200.4" "227.9")
+#z_velocities=("217.4" "177.3" "115.7" "40.2")
 
 # computes angles
-angles=(20 40 60 80)
+#angles=(20 40 60 80)
 
 # string for printing stars
 stars="******"
@@ -55,18 +61,20 @@ stars="******"
 # remove temporary files left after lammps script execution
 clean() {
   # rm input.data
-  rm $script_dir/$input_file
+  rm -f $script_dir/$input_file
   # rm output.data
-  rm $script_dir/$output
+  rm -f $script_dir/$output
   # rm .in file
-  rm $script_dir/$in_file 
+  rm -f $script_dir/$in_file 
   # rm dumps
-  rm $script_dir/$dump_last_step
-  rm $script_dir/$dump_last_10
-  rm $script_dir/$dump_all
-  rm $script_dir/$dump_vor
+  rm -f $script_dir/$dump_last_step
+  rm -f $script_dir/$dump_last_10
+  rm -f $script_dir/$dump_all
+  rm -f $script_dir/$dump_vor
   # rm log.lammps
-  rm $script_dir/$log
+  rm -f $script_dir/$log
+
+  echo "removed temp compute files"; echo; echo "$stars"
 }
 
 # get lammps data parser
@@ -105,6 +113,7 @@ change_template_in_file() {
 }
 
 copy_lammps_results() {
+  compute_dir=$1
   # cp output.data
   cp $script_dir/$output $compute_dir/$output
   # cp .in file
@@ -127,6 +136,7 @@ run_lammps_script() {
 
 # parse lammps dump files
 parse_dump_files() {
+  compute_dir=$1
   #parse carbon z distribution dump
   echo "last 10 steps carbon distribution average calculation"
   $data_parser "c" $script_dir/$dump_last_10 $compute_dir/C_z_dist.vals "temp"
@@ -138,35 +148,42 @@ parse_dump_files() {
   echo; echo "$stars"
 }
 
-setup_compute_dir() {
-  echo "compute: $compute_name"; echo; echo "$stars"
-  
-  compute_dir="$results_dir/$compute_name"
-  new_input_data="$compute_dir/$input_file"
-  new_in_data="$compute_dir/$in_file"
-  
-  rm -rf "$compute_dir"; mkdir "$compute_dir" 
+# get number of OpenMP threads
+get_omp_num_threads() {
+  if [ -z "$1" ]; then
+    omp_num_threads=8
+  else
+    omp_num_threads="$1"
+  fi
+
+  printf "%d" $omp_num_threads
 }
 
 # auto computation for straight fall with different speeds and positions
 straight_fall() {
-  set_omp_num_threads 8
+  set_omp_num_threads $(get_omp_num_threads $1)
   
   # variants loop
-  for speed_i in "${speeds[@]}"
+  for speed_i in ${speeds}
   do
-    for move_i in {1..5}
+    for move_i in $(seq 1 5)
     do
       compute_name="moved_${move_i}_speed_${speed_i}"     
-      setup_compute_dir
+      echo "compute: $compute_name"; echo; echo "$stars"
      
+      compute_dir="$results_dir/$compute_name"
+      new_input_data="$compute_dir/$input_file"
+      new_in_data="$compute_dir/$in_file"
+      
+      rm -rf "$compute_dir"; mkdir "$compute_dir" 
+
       randomize_carbon_xy_position "$new_input_data"
       change_template_in_file "-$speed_i" "0" 
       
       run_lammps_script 
       
-      copy_lammps_results  
-      parse_dump_files 
+      copy_lammps_results "$compute_dir"
+      parse_dump_files "$compute_dir"
       clean
     done
   done
@@ -177,8 +194,8 @@ above_surface() {
   rm -rf $vals
   touch $vals
 
-  thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
-  thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
+  #thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
+  #thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
   printf "****************" >> $vals
   for threshold_i in {0..5}
   do
@@ -286,8 +303,8 @@ above_surface() {
   rm -rf $TMP
   touch $TMP
 
-  thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
-  thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
+ # thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
+ # thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
   printf "************" >> $TMP
   for threshold_i in {0..5}
   do
@@ -317,14 +334,6 @@ above_surface() {
 }
 
 echo "### LAMMPS AUTOCOMPUTE SCRIPT ###"; echo; echo "$stars"  
-mkdir "$results_dir"
+mkdir -p "$results_dir"
 
-if declare -f "$1" > /dev/null
-then
-  # call arguments verbatim
-  "$@"
-else
-  # Show a helpful error
-  echo "'$1' is not a known function name" >&2
-  exit 1
-fi
+"$1" "$2"

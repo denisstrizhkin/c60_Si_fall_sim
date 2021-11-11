@@ -49,11 +49,29 @@ speeds="${speeds} 231.4"
 speeds="${speeds} 283.4"
 speeds="${speeds} 365.88"
 
-#x_velocities=("79.1" "148.7" "200.4" "227.9")
-#z_velocities=("217.4" "177.3" "115.7" "40.2")
+x_vels=""
+x_vels="${x_vels} 79.1"
+x_vels="${x_vels} 148.7"
+x_vels="${x_vels} 200.4"
+x_vels="${x_vels} 227.9"
+x_vels_at() { echo ${x_vels} | cut -d" " -f${1}; }
+
+z_vels=""
+z_vels="${z_vels} 217.4"
+z_vels="${z_vels} 177.3"
+z_vels="${z_vels} 115.7"
+z_vels="${z_vels} 40.2"
+z_vels_at() { echo ${z_vels} | cut -d" " -f${1}; }
 
 # computes angles
-#angles=(20 40 60 80)
+angles=""
+#angles="${angles} 20"
+#angles="${angles} 40"
+angles="${angles} 50"
+#angles="${angles} 60"
+angles="${angles} 70"
+#angles="${angles} 80"
+angles_at() { echo ${angles} | cut -d" " -f${1}; }
 
 # string for printing stars
 stars="******"
@@ -97,6 +115,7 @@ set_omp_num_threads() {
 randomize_carbon_xy_position() {
   echo "moving carbon"
   "$data_parser" 'r' "$input_template" "$1" "temp"
+  "$data_parser" 'a' "$1" "$1" "$2"
   cp "$1" $script_dir/$input_file
   echo; echo "$stars" 
 }
@@ -177,8 +196,37 @@ straight_fall() {
       
       rm -rf "$compute_dir"; mkdir "$compute_dir" 
 
-      randomize_carbon_xy_position "$new_input_data"
+      randomize_carbon_xy_position "$new_input_data" "0"
       change_template_in_file "-$speed_i" "0" 
+      
+      run_lammps_script 
+      
+      copy_lammps_results "$compute_dir"
+      parse_dump_files "$compute_dir"
+      clean
+    done
+  done
+}
+
+angle_fall() {
+  set_omp_num_threads $(get_omp_num_threads $1)
+  
+  # variants loop
+  for angle_i in $(seq 1 2)
+  do 
+    for move_i in $(seq 1 5)
+    do
+      compute_name="moved_${move_i}_angle_$(angles_at $angle_i)"     
+      echo "compute: $compute_name"; echo; echo "$stars"
+     
+      compute_dir="$results_dir/$compute_name"
+      new_input_data="$compute_dir/$input_file"
+      new_in_data="$compute_dir/$in_file"
+      
+      rm -rf "$compute_dir"; mkdir "$compute_dir" 
+
+      randomize_carbon_xy_position "$new_input_data" "$(angles_at $angle_i)"
+      change_template_in_file "-$(z_vels_at $angle_i)" "-$(x_vels_at $angle_i)"
       
       run_lammps_script 
       
@@ -220,80 +268,6 @@ above_surface() {
         printf "%5d" $data >> $vals
       done
       echo "" >> $vals
-    done
-  done
-}
-
-begin() {
-  # print title
-  echo "### LAMMPS AUTOCOMPUTE SCRIPT ###"; echo; echo "$STARS"
-  
-  # set number of OpenMP threads
-  export OMP_NUM_THREADS=8
-  echo "set number of OpenMP threads to $OMP_NUM_THREADS"; echo; echo "$STARS"
-  
-  # make a directory to store results
-  rm -rf result
-  mkdir result
-  
-  # variants loop
-  for angle_i in {0..3}
-  do
-    for move_i in {4..5}
-    do
-      COMPUTE_NAME="angle_${ANGLES[angle_i]}_move_${move_i}"
-      echo "compute: $COMPUTE_NAME"; echo; echo "$STARS"
-  
-      RESULTS_DIR="$DIR/result/$COMPUTE_NAME"
-      NEW_INPUT_DATA="$RESULTS_DIR/$INPUT"
-      NEW_IN_DATA="$RESULTS_DIR/$IN"
-  
-      mkdir $RESULTS_DIR
-      
-      echo "moving carbon"
-      $DATA_PARSER 'r' $INPUT_TEMPLATE $NEW_INPUT_DATA "temp"
-      $DATA_PARSER 'a' $NEW_INPUT_DATA $NEW_INPUT_DATA "${ANGLES[angle_i]}"
-      cp $NEW_INPUT_DATA $DIR/$INPUT
-      echo; echo "$STARS"
-  
-      echo "changing .in file"
-      echo "# CONSTANTS" > $DIR/$IN
-      echo 'variable zero_lvl equal "'$ZERO_LVL'"' >> $DIR/$IN 
-      echo 'variable carbon_vz equal "'-${Z_VELOCITIES[angle_i]}'"' >> $DIR/$IN
-      echo 'variable carbon_vx equal "'-${X_VELOCITIES[angle_i]}'"' >> $DIR/$IN
-      awk "NR >= 5" $IN_TEMPLATE >> $DIR/$IN
-      echo; echo "$STARS"
-      
-      # run lammps script
-      echo "running lammps script"; echo " ---"
-      lmp -sf omp -in fall.in
-  
-      ### COPY OUTPUT ###
-      # cp output.data
-      cp $DIR/$OUTPUT $RESULTS_DIR/$OUTPUT
-      # cp .in file
-      cp $DIR/$IN $RESULTS_DIR/$IN 
-      # cp dumps
-      cp $DIR/$DUMP_LAST_STEP $RESULTS_DIR/$DUMP_LAST_STEP
-      cp $DIR/$DUMP_LAST10 $RESULTS_DIR/$DUMP_LAST10
-      cp $DIR/$DUMP_ALL $RESULTS_DIR/$DUMP_ALL
-      cp $DIR/$DUMP_VOR $RESULTS_DIR/$DUMP_VOR
-      # cp log.lammps
-      cp $DIR/$LOG $RESULTS_DIR/$LOG
-      echo; echo "$STARS"
-      
-      # parse carbon z distribution dump
-      echo "last 10 steps carbon distribution average calculation"
-      $DATA_PARSER "c" $DIR/$DUMP_LAST10 $RESULTS_DIR/C_z_dist.vals "temp"
-      echo; echo "$STARS"
-      
-      # parse voro dump
-      echo "parsing voronoi time relation dump"
-      $DATA_PARSER "v" $DIR/$DUMP_VOR $RESULTS_DIR/Voro_time.vals "temp"
-      echo; echo "$STARS"
-
-      #clean temp files
-      clean
     done
   done
 }

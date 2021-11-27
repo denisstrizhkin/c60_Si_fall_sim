@@ -150,8 +150,9 @@ copy_lammps_results() {
 # running lammps script
 run_lammps_script() {
   echo "running lammps script"; echo " ---"
-  mpirun -np 4 lmp_mpi -in "$script_dir/$in_file" 
-  #lmp -sf omp -in "$script_dir/$in_file" 
+  #mpirun --use-hwthread-cpus -np 8 lmp_mpi -in "$script_dir/$in_file" 
+  #mpirun -np 4 lmp_omp -sf omp -pk omp 4 -in "$script_dir/$in_file"
+  lmp_omp -sf omp -in "$script_dir/$in_file" 
 }
 
 # parse lammps dump files

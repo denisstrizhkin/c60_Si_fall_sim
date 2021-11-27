@@ -39,7 +39,7 @@ dump_vor="vor_time.dump"
 ### OTHER VARS
 
 # zero level
-zero_lvl="-0.0184635"
+zero_lvl="0"
 
 # computes speeds
 speeds=""

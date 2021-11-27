@@ -150,7 +150,8 @@ copy_lammps_results() {
 # running lammps script
 run_lammps_script() {
   echo "running lammps script"; echo " ---"
-  lmp -sf omp -in "$script_dir/$in_file" 
+  mpirun -np 4 lmp_mpi -in "$script_dir/$in_file" 
+  #lmp -sf omp -in "$script_dir/$in_file" 
 }
 
 # parse lammps dump files

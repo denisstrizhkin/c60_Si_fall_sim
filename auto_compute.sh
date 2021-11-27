@@ -50,17 +50,21 @@ speeds="${speeds} 283.4"
 speeds="${speeds} 365.88"
 
 x_vels=""
-x_vels="${x_vels} 79.1"
-x_vels="${x_vels} 148.7"
-x_vels="${x_vels} 200.4"
-x_vels="${x_vels} 227.9"
+#x_vels="${x_vels} 79.1"  # 20
+#x_vels="${x_vels} 148.7" # 40
+x_vels="${x_vels} 177.3" # 50
+#x_vels="${x_vels} 200.4" # 60
+x_vels="${x_vels} 217.4" # 70
+#x_vels="${x_vels} 227.9" # 80
 x_vels_at() { echo ${x_vels} | cut -d" " -f${1}; }
 
 z_vels=""
-z_vels="${z_vels} 217.4"
-z_vels="${z_vels} 177.3"
-z_vels="${z_vels} 115.7"
-z_vels="${z_vels} 40.2"
+#z_vels="${z_vels} 217.4" # 20
+#z_vels="${z_vels} 177.3" # 40
+z_vels="${z_vels} 148.7" # 50
+#z_vels="${z_vels} 115.7" # 60
+z_vels="${z_vels} 79.1"  # 70
+#z_vels="${z_vels} 40.2"  # 80
 z_vels_at() { echo ${z_vels} | cut -d" " -f${1}; }
 
 # computes angles

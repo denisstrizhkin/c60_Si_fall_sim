@@ -20,6 +20,7 @@ group   g_fu type 2
 group   g_si_all type 1
 lattice diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
 region  r_si_center block -11 11 -11 11 -34 0 units lattice
+region  r_si_all    block -12 12 -12 12 -35 0 units lattice
 group   g_si_center region r_si_center
 group   g_si_thermostat subtract g_si_all g_si_center
 group   g_output id 1
@@ -78,6 +79,7 @@ thermo_style   custom step c_sys_pe c_sys_ke v_sys_fe c_above_zero_lvl
 # FIX
 fix f_1 all nve
 fix f_2 g_si_thermostat nvt temp 1e-3 1e-3 $(100.0*dt)
+fix f_3 all electron/stopping 10.0 potentials/elstop-table.txt region r_si_all
 
 # DUMP
 dump  d_vor g_output custom 20 vor_time.dump v_vacancies v_sputter_all &

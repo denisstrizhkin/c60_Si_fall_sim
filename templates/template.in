@@ -71,7 +71,7 @@ variable  sys_fe equal "c_sys_pe + c_sys_ke"
 
 # THERMO
 reset_timestep 0
-timestep       0.005
+timestep       0.001
 thermo         5
 thermo_style   custom step c_sys_pe c_sys_ke v_sys_fe c_above_zero_lvl &
     time dt
@@ -81,7 +81,7 @@ thermo_style   custom step c_sys_pe c_sys_ke v_sys_fe c_above_zero_lvl &
 fix f_1 all nve
 fix f_2 g_si_thermostat nvt temp 1e-3 1e-3 $(100.0*dt)
 fix f_3 all electron/stopping 10.0 potentials/elstop-table.txt region r_si_all
-fix f_4 all dt/reset 5 NULL NULL 0.1
+fix f_4 all dt/reset 5 0.001 NULL 0.1
 
 # DUMP
 dump  d_vor g_output custom 20 vor_time.dump v_vacancies v_sputter_all &

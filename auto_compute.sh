@@ -43,11 +43,11 @@ zero_lvl="0"
 
 # computes speeds
 speeds=""
-speeds="${speeds} 115.7"
-speeds="${speeds} 163.6"
-speeds="${speeds} 231.4"
-speeds="${speeds} 283.4"
-speeds="${speeds} 365.88"
+#speeds="${speeds} 115.7"  # 500  eV
+#speeds="${speeds} 163.6"  # 1000 eV
+speeds="${speeds} 231.4"  # 2000 eV
+#speeds="${speeds} 283.4"  # 3000 eV
+#speeds="${speeds} 365.88" # 5000 eV
 
 x_vels=""
 #x_vels="${x_vels} 79.1"  # 20
@@ -191,7 +191,7 @@ straight_fall() {
   # variants loop
   for speed_i in ${speeds}
   do
-    for move_i in $(seq 1 5)
+    for move_i in $(seq 1 1) # seq 1 n(5)
     do
       compute_name="moved_${move_i}_speed_${speed_i}"     
       echo "compute: $compute_name"; echo; echo "$stars"

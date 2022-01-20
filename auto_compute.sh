@@ -137,6 +137,7 @@ change_template_in_file() {
 
 copy_lammps_results() {
   compute_dir=$1
+  
   # cp output.data
   cp $script_dir/$output $compute_dir/$output
   # cp .in file
@@ -148,6 +149,7 @@ copy_lammps_results() {
   cp $script_dir/$dump_vor $compute_dir/$dump_vor
   # cp log.lammps
   cp $script_dir/$log $compute_dir/$log
+  
   echo; echo "$stars"
 }
 

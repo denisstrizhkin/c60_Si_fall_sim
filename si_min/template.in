@@ -1,0 +1,45 @@
+# VARIABLES
+variable x_left  equal "-12"
+variable x_right equal "12"
+
+variable y_left  equal "-12"
+variable y_right equal "12"
+
+variable z_down  equal "-35"
+variable z_up    equal "10"
+# VARIABLES END
+
+# INIT
+units		metal
+dimension	3
+boundary	p p f
+atom_style	atomic
+
+# ADD SI
+lattice diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+
+region  r_symbox block x_left x_right y_left y_right z_down z_up units lattice
+region  r_si     block x_left x_right y_left y_right z_down 0    units lattice
+
+create_box 1 r_symbox
+create_atoms 1 region r_si
+
+mass 1 28.08553
+
+# POTENTIALS
+pair_style tersoff/zbl
+pair_coeff * * SiC.tersoff.zbl Si
+neighbor 3.0 bin
+
+# MINIMIZE
+minimize 1e-20 1e-20 1000 1000
+
+# DUMP
+reset_timestep	0
+timestep	0.001
+thermo          1
+thermo_style    custom step ke
+fix		f_1 all nve
+dump		d_1 all custom 1 si_min.dump id xs ys zs
+run		20
+write_data	si_min.output.data

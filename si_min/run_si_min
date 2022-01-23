@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set_omp_num_threads() {
+  export OMP_NUM_THREADS="$1"
+  echo "set number of OpenMP threads to $OMP_NUM_THREADS"; echo "---"
+}
+
+get_omp_num_threads() {
+  if [ -z "$1" ]; then
+    omp_num_threads=8
+  else
+    omp_num_threads="$1"
+  fi
+
+  printf "%d" $omp_num_threads
+}
+
+set_omp_num_threads $(get_omp_num_threads $1)
+echo "running lammps script"; echo "---"
+lmp_omp -sf omp -in "template.in"

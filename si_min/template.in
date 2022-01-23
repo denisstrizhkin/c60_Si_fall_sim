@@ -18,8 +18,8 @@ atom_style	atomic
 # ADD SI
 lattice diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
 
-region  r_symbox block x_left x_right y_left y_right z_down z_up units lattice
-region  r_si     block x_left x_right y_left y_right z_down 0    units lattice
+region  r_symbox block ${x_left} ${x_right} ${y_left} ${y_right} ${z_down} ${z_up} units lattice
+region  r_si     block ${x_left} ${x_right} ${y_left} ${y_right} ${z_down} 0      units lattice
 
 create_box 1 r_symbox
 create_atoms 1 region r_si

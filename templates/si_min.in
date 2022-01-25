@@ -28,7 +28,7 @@ mass 1 28.08553
 
 # POTENTIALS
 pair_style tersoff/zbl
-pair_coeff * * SiC.tersoff.zbl Si
+pair_coeff * * potentials/SiC.tersoff.zbl Si
 neighbor 3.0 bin
 
 # MINIMIZE

@@ -5,6 +5,10 @@
 # get script path
 script_dir="$(dirname "$0")"
 
+# sources
+. "$script_dir/functions/run_lammps.sh"
+. "$script_dir/functions/utility.sh"
+
 # folders
 results_dir="$script_dir/results"
 templates_dir="$script_dir/templates"
@@ -12,7 +16,7 @@ templates_dir="$script_dir/templates"
 # lammps data parser
 data_parser="$script_dir/lammps_data_parser/lammps_data_parser"
 
-# templates 
+# templates
 in_template="$templates_dir/template.in"
 input_template="$templates_dir/template.input.data"
 
@@ -21,7 +25,7 @@ input_template="$templates_dir/template.input.data"
 # log file
 log="log.lammps"
 
-# output file 
+# output file
 output="fall.output.data"
 
 # .in file
@@ -82,19 +86,14 @@ stars="******"
 
 # remove temporary files left after lammps script execution
 clean() {
-  # rm input.data
-  rm -f $script_dir/$input_file
-  # rm output.data
-  rm -f $script_dir/$output
-  # rm .in file
-  rm -f $script_dir/$in_file 
-  # rm dumps
-  rm -f $script_dir/$dump_last_step
-  rm -f $script_dir/$dump_last_10
-  rm -f $script_dir/$dump_all
-  rm -f $script_dir/$dump_vor
-  # rm log.lammps
-  rm -f $script_dir/$log
+  # rm *.data files
+  rm -f "$script_dir/"*.data
+  # rm *.in files
+  rm -f "$script_dir/"*.in
+  # rm *.dump files
+  rm -f "$script_dir/"*.dump
+  # rm *.lammps
+  rm -f "$script_dir/"*.lammps
 
   echo "removed temp compute files"; echo; echo "$stars"
 }
@@ -108,107 +107,46 @@ get_parser() {
   make lammps_data_parser
 }
 
-# set number of OpenMP threads
-set_omp_num_threads() {
-  export OMP_NUM_THREADS="$1"
-  echo "set number of OpenMP threads to $OMP_NUM_THREADS";
-  echo; echo "$stars" 
-}
+# minimize Si crystal
+si_min() {
+  set_omp_num_threads $(get_omp_num_threads $1)
 
-# move x and y positions of all carbon atoms by a small random delta
-randomize_carbon_xy_position() {
-  echo "moving carbon"
-  "$data_parser" 'r' "$input_template" "$1" "temp"
-  "$data_parser" 'a' "$1" "$1" "$2"
-  cp "$1" $script_dir/$input_file
-  echo; echo "$stars" 
-}
+  si_min_in="si_min.in"
+  cp "$script_dir/$templates_dir/$si_min_in" "$script_dir/$si_min_in"
 
-# change template .in file by assigning zero_lvl and x, z velocities for simulation
-change_template_in_file() {
-  echo "changing .in file"
-  echo "# CONSTANTS" > $script_dir/$in_file
-  echo 'variable zero_lvl equal "'$zero_lvl'"' >> $script_dir/$in_file 
-  echo 'variable carbon_vz equal "'"$1"'"' >> $script_dir/$in_file
-  echo 'variable carbon_vx equal "'"$2"'"' >> $script_dir/$in_file
-  awk "NR >= 5" $in_template >> $script_dir/$in_file
-  echo; echo "$stars"
-}
+  si_min_dir="$script_dir/$results_dir/si_min"
+  rm -rf $si_min_dir
+  mkdir -p $si_min_dir
 
-copy_lammps_results() {
-  compute_dir=$1
+  run_lammps_script "$script_dir/$si_min_in"
   
-  # cp output.data
-  cp $script_dir/$output $compute_dir/$output
-  # cp .in file
-  cp $script_dir/$in_file $compute_dir/$in_file 
-  # cp dumps
-  cp $script_dir/$dump_last_step $compute_dir/$dump_last_step
-  cp $script_dir/$dump_last_10 $compute_dir/$dump_last_10
-  cp $script_dir/$dump_all $compute_dir/$dump_all
-  cp $script_dir/$dump_vor $compute_dir/$dump_vor
-  # cp log.lammps
-  cp $script_dir/$log $compute_dir/$log
-  
-  echo; echo "$stars"
-}
-
-# running lammps script
-run_lammps_script() {
-  echo "running lammps script"; echo " ---"
-  #mpirun --use-hwthread-cpus -np 8 lmp_mpi -in "$script_dir/$in_file" 
-  #mpirun -np 4 lmp_omp -sf omp -pk omp 4 -in "$script_dir/$in_file"
-  lmp_omp -sf omp -in "$script_dir/$in_file" 
-}
-
-# parse lammps dump files
-parse_dump_files() {
-  compute_dir=$1
-  #parse carbon z distribution dump
-  echo "last 10 steps carbon distribution average calculation"
-  $data_parser "c" $script_dir/$dump_last_10 $compute_dir/C_z_dist.vals "temp"
-  echo; echo "$stars"
-  
-  # parse voro dump
-  echo "parsing voronoi time relation dump"
-  $data_parser "v" $script_dir/$dump_vor $compute_dir/Voro_time.vals "temp"
-  echo; echo "$stars"
-}
-
-# get number of OpenMP threads
-get_omp_num_threads() {
-  if [ -z "$1" ]; then
-    omp_num_threads=8
-  else
-    omp_num_threads="$1"
-  fi
-
-  printf "%d" $omp_num_threads
+  cp "$script_dir/"*.data $si_min_dir
+  clean
 }
 
 # auto computation for straight fall with different speeds and positions
 straight_fall() {
   set_omp_num_threads $(get_omp_num_threads $1)
-  
+
   # variants loop
   for speed_i in ${speeds}
   do
     for move_i in $(seq 1 1) # seq 1 n(5)
     do
-      compute_name="moved_${move_i}_speed_${speed_i}"     
+      compute_name="moved_${move_i}_speed_${speed_i}"
       echo "compute: $compute_name"; echo; echo "$stars"
-     
+
       compute_dir="$results_dir/$compute_name"
       new_input_data="$compute_dir/$input_file"
       new_in_data="$compute_dir/$in_file"
-      
-      rm -rf "$compute_dir"; mkdir "$compute_dir" 
+
+      rm -rf "$compute_dir"; mkdir "$compute_dir"
 
       randomize_carbon_xy_position "$new_input_data" "0"
-      change_template_in_file "-$speed_i" "0" 
-      
-      run_lammps_script 
-      
+      change_template_in_file "-$speed_i" "0"
+
+      run_lammps_script "$script_dir/$in_file"
+
       copy_lammps_results "$compute_dir"
       parse_dump_files "$compute_dir"
       clean
@@ -218,26 +156,26 @@ straight_fall() {
 
 angle_fall() {
   set_omp_num_threads $(get_omp_num_threads $1)
-  
+
   # variants loop
   for angle_i in $(seq 1 2)
-  do 
+  do
     for move_i in $(seq 1 5)
     do
-      compute_name="moved_${move_i}_angle_$(angles_at $angle_i)"     
+      compute_name="moved_${move_i}_angle_$(angles_at $angle_i)"
       echo "compute: $compute_name"; echo; echo "$stars"
-     
+
       compute_dir="$results_dir/$compute_name"
       new_input_data="$compute_dir/$input_file"
       new_in_data="$compute_dir/$in_file"
-      
-      rm -rf "$compute_dir"; mkdir "$compute_dir" 
+
+      rm -rf "$compute_dir"; mkdir "$compute_dir"
 
       randomize_carbon_xy_position "$new_input_data" "$(angles_at $angle_i)"
       change_template_in_file "-$(z_vels_at $angle_i)" "-$(x_vels_at $angle_i)"
-      
-      run_lammps_script 
-      
+
+      run_lammps_script "$script_dir/$in_file"
+
       copy_lammps_results "$compute_dir"
       parse_dump_files "$compute_dir"
       clean
@@ -267,7 +205,7 @@ above_surface() {
 
       COMPUTE_NAME="moved_${move_i}_speed_${speed_i}"
       echo "compute: $COMPUTE_NAME"; echo; echo "$stars"
-  
+
       COMPUTE_DIR="$RESULT_DIR/$COMPUTE_NAME"
       for threshold_i in {0..5}
       do
@@ -302,7 +240,7 @@ above_surface() {
 
       COMPUTE_NAME="angle_${ANGLES[angle_i]}_move_${move_i}"
       echo "compute: $COMPUTE_NAME"; echo; echo "$STARS"
-  
+
       COMPUTE_DIR="$RESULT_DIR/$COMPUTE_NAME"
       for threshold_i in {0..5}
       do
@@ -315,7 +253,7 @@ above_surface() {
   done
 }
 
-echo "### LAMMPS AUTOCOMPUTE SCRIPT ###"; echo; echo "$stars"  
+echo "### LAMMPS AUTOCOMPUTE SCRIPT ###"; echo; echo "$stars"
 mkdir -p "$results_dir"
 
 "$1" "$2"

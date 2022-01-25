@@ -92,7 +92,7 @@ dump  d_all all custom 20 all.dump id type x y z vx vy vz c_atom_ke
 velocity  g_fu set v_carbon_vx NULL v_carbon_vz sum yes units box
 
 # RUN
-run 50
+run 5000
 
 # LAST STEP DUMP
 undump  d_vor

@@ -1,0 +1,24 @@
+# INIT
+units		metal
+dimension	3
+boundary	p p p
+atom_style	atomic
+read_data	fu_min.input.data
+
+# POTENTIALS
+pair_style	airebo 3.0
+pair_coeff	* * CH.airebo C
+neighbor	3.0 bin
+
+# MINIMIZE
+minimize	1e-20 1e-20 100 100
+
+# DUMP
+reset_timestep	0
+timestep	0.001
+thermo          1
+thermo_style    custom step ke
+fix		f_1 all nve
+dump		d_1 all custom 1 fu_min.dump id xs ys zs
+run		20
+write_data	fu_min.output.data

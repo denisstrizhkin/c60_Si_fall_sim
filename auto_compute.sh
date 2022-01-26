@@ -30,10 +30,10 @@ log="log.lammps"
 output="fall.output.data"
 
 # .in file
-in_file="fall.in"
+fall_in="fall.in"
 
 # input file
-input_file="fall.input.data"
+fall_input="fall.input.data"
 
 # dump files
 dump_all="all.dump"
@@ -110,46 +110,30 @@ get_parser() {
 
 # normalize Si crystal after setting specific temperature
 si_normalize() {
-  set_omp_num_threads $(get_omp_num_threads $1)
-
   temperature=300
 
   norm_in="si_normalize.in"
   cp "$in_files_dir/$norm_in" "$script_dir/$norm_in"
 
   norm_dir="$results_dir/norm"
-  rm -rf $norm_dir
-  mkdir -p $norm_dir
+  create_compute_results_dir $norm_dir
 
-  run_lammps_script "$script_dir/$norm_in"
-  
-  copy_lammps_results $norm_dir
-
-  clean
+  run_lammps_script "$1" "$script_dir/$norm_in" "$norm_dir"
 }
 
 # minimize Si crystal
 si_min() {
-  set_omp_num_threads $(get_omp_num_threads $1)
-
   si_min_in="si_min.in"
-  cp "$script_dir/$in/$si_min_in" "$script_dir/$si_min_in"
+  cp "$in_files_dir/$si_min_in" "$script_dir/$si_min_in"
 
   si_min_dir="$results_dir/si_min"
-  rm -rf $si_min_dir
-  mkdir -p $si_min_dir
+  create_compute_results_dir $si_min_dir
 
-  run_lammps_script "$script_dir/$si_min_in"
-
-  copy_lammps_results $si_min_dir
-
-  clean
+  run_lammps_script "$1" "$script_dir/$si_min_in" "$si_min_dir"
 }
 
 # auto computation for straight fall with different speeds and positions
 straight_fall() {
-  set_omp_num_threads $(get_omp_num_threads $1)
-
   # variants loop
   for speed_i in ${speeds}
   do
@@ -159,26 +143,21 @@ straight_fall() {
       echo "compute: $compute_name"; echo; echo "$stars"
 
       compute_dir="$results_dir/$compute_name"
-      new_input_data="$compute_dir/$input_file"
-      new_in_data="$compute_dir/$in_file"
+      new_input_data="$compute_dir/$fall_input"
+      new_in_data="$compute_dir/$fall_in"
 
-      rm -rf "$compute_dir"; mkdir "$compute_dir"
+      create_compute_results_dir "$compute_dir"
 
       randomize_carbon_xy_position "$new_input_data" "0"
       change_template_in_file "-$speed_i" "0"
 
-      run_lammps_script "$script_dir/$in_file"
-
-      copy_lammps_results "$compute_dir"
-      parse_dump_files "$compute_dir"
-      clean
+      run_lammps_script "$1" "$script_dir/$fall_in" "$compute_dir"
+      # parse_dump_files "$compute_dir"
     done
   done
 }
 
 angle_fall() {
-  set_omp_num_threads $(get_omp_num_threads $1)
-
   # variants loop
   for angle_i in $(seq 1 2)
   do
@@ -188,19 +167,15 @@ angle_fall() {
       echo "compute: $compute_name"; echo; echo "$stars"
 
       compute_dir="$results_dir/$compute_name"
-      new_input_data="$compute_dir/$input_file"
-      new_in_data="$compute_dir/$in_file"
+      new_input_data="$compute_dir/$fall_input"
+      new_in_data="$compute_dir/$fall_in"
 
-      rm -rf "$compute_dir"; mkdir "$compute_dir"
+      create_compute_results_dir "$compute_dir"
 
       randomize_carbon_xy_position "$new_input_data" "$(angles_at $angle_i)"
       change_template_in_file "-$(z_vels_at $angle_i)" "-$(x_vels_at $angle_i)"
 
-      run_lammps_script "$script_dir/$in_file"
-
-      copy_lammps_results "$compute_dir"
-      parse_dump_files "$compute_dir"
-      clean
+      run_lammps_script "$1" "$script_dir/$fall_in" "$compute_dir"
     done
   done
 }

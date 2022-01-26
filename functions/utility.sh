@@ -3,31 +3,40 @@ randomize_carbon_xy_position() {
   echo "moving carbon"
   "$data_parser" 'r' "$input_template" "$1" "temp"
   "$data_parser" 'a' "$1" "$1" "$2"
-  cp "$1" $script_dir/$input_file
+  cp "$1" $script_dir/$fall_input
   echo; echo "$stars"
 }
 
 # change template .in file by assigning zero_lvl and x, z velocities for simulation
 change_template_in_file() {
   echo "changing .in file"
-  echo "# CONSTANTS" > $script_dir/$in_file
-  echo 'variable zero_lvl equal "'$zero_lvl'"' >> $script_dir/$in_file
-  echo 'variable carbon_vz equal "'"$1"'"' >> $script_dir/$in_file
-  echo 'variable carbon_vx equal "'"$2"'"' >> $script_dir/$in_file
-  awk "NR >= 5" $in_template >> $script_dir/$in_file
+  local dest="$script_dir/$fall_in"
+
+  echo "# CONSTANTS"                           >  $dest
+  echo 'variable zero_lvl equal "'$zero_lvl'"' >> $dest
+  echo 'variable carbon_vz equal "'"$1"'"'     >> $dest
+  echo 'variable carbon_vx equal "'"$2"'"'     >> $dest
+
+  awk "NR >= 5" $in_template >> $dest
   echo; echo "$stars"
+}
+
+create_compute_results_dir() {
+  rm -rf   $1
+  mkdir -p $1
 }
 
 copy_lammps_results() {
   compute_dir=$1
   # cp *.data   files
-  cp $script_dir/*.data   $compute_dir
+  cp -f $script_dir/*.data   $compute_dir
   # cp *.in     files
-  cp $script_dir/*.in     $compute_dir
+  cp -f $script_dir/*.in     $compute_dir
   # cp *.dump   files
-  cp $script_dir/*.dump   $compute_dir
+  cp -f $script_dir/*.dump   $compute_dir
   # cp *.lammps files
-  cp $script_dir/*.lammps $compute_dir
+  cp -f $script_dir/*.lammps $compute_dir
+  echo "copied results"; echo; echo "$stars"
 }
 
 # parse lammps dump files

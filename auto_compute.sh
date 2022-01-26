@@ -11,14 +11,15 @@ script_dir="$(dirname "$0")"
 
 # folders
 results_dir="$script_dir/results"
-templates_dir="$script_dir/templates"
+in_files_dir="$script_dir/in_files"
+input_files_dir="$script_dir/input_files"
 
 # lammps data parser
 data_parser="$script_dir/lammps_data_parser/lammps_data_parser"
 
 # templates
-in_template="$templates_dir/template.in"
-input_template="$templates_dir/template.input.data"
+in_template="$in_files_dir/fall.in"
+input_template="$input_files_dir/fall.input.data"
 
 ### FILE NAMES ###
 
@@ -107,20 +108,41 @@ get_parser() {
   make lammps_data_parser
 }
 
+# normalize Si crystal after setting specific temperature
+si_normalize() {
+  set_omp_num_threads $(get_omp_num_threads $1)
+
+  temperature=300
+
+  norm_in="si_normalize.in"
+  cp "$in_files_dir/$norm_in" "$script_dir/$norm_in"
+
+  norm_dir="$results_dir/norm"
+  rm -rf $norm_dir
+  mkdir -p $norm_dir
+
+  run_lammps_script "$script_dir/$norm_in"
+  
+  copy_lammps_results $norm_dir
+
+  clean
+}
+
 # minimize Si crystal
 si_min() {
   set_omp_num_threads $(get_omp_num_threads $1)
 
   si_min_in="si_min.in"
-  cp "$script_dir/$templates_dir/$si_min_in" "$script_dir/$si_min_in"
+  cp "$script_dir/$in/$si_min_in" "$script_dir/$si_min_in"
 
-  si_min_dir="$script_dir/$results_dir/si_min"
+  si_min_dir="$results_dir/si_min"
   rm -rf $si_min_dir
   mkdir -p $si_min_dir
 
   run_lammps_script "$script_dir/$si_min_in"
-  
-  cp "$script_dir/"*.data $si_min_dir
+
+  copy_lammps_results $si_min_dir
+
   clean
 }
 

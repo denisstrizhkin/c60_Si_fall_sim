@@ -20,20 +20,14 @@ change_template_in_file() {
 
 copy_lammps_results() {
   compute_dir=$1
-
-  # cp output.data
-  cp $script_dir/$output $compute_dir/$output
-  # cp .in file
-  cp $script_dir/$in_file $compute_dir/$in_file
-  # cp dumps
-  cp $script_dir/$dump_last_step $compute_dir/$dump_last_step
-  cp $script_dir/$dump_last_10 $compute_dir/$dump_last_10
-  cp $script_dir/$dump_all $compute_dir/$dump_all
-  cp $script_dir/$dump_vor $compute_dir/$dump_vor
-  # cp log.lammps
-  cp $script_dir/$log $compute_dir/$log
-
-  echo; echo "$stars"
+  # cp *.data   files
+  cp $script_dir/*.data   $compute_dir
+  # cp *.in     files
+  cp $script_dir/*.in     $compute_dir
+  # cp *.dump   files
+  cp $script_dir/*.dump   $compute_dir
+  # cp *.lammps files
+  cp $script_dir/*.lammps $compute_dir
 }
 
 # parse lammps dump files

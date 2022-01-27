@@ -64,17 +64,11 @@ variable  sputter_c   atom "c_sputter_sum_c"
 #per atom ke
 compute   atom_ke all ke/atom
 
-#full system energy
-compute   sys_pe all pe
-compute   sys_ke all ke
-variable  sys_fe equal "c_sys_pe + c_sys_ke"
-
 # THERMO
 reset_timestep 0
 timestep       0.001
 thermo         5
-thermo_style   custom step c_sys_pe c_sys_ke v_sys_fe c_above_zero_lvl &
-    time dt
+thermo_style   custom step pe ke etotal c_above_zero_lvl time dt
 #thermo_modify  lost ignore
 
 # FIX

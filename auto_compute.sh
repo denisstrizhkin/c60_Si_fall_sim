@@ -109,11 +109,12 @@ get_parser() {
 }
 
 # normalize Si crystal after setting specific temperature
-si_normalize() {
+si_norm() {
   temperature=300
 
-  norm_in="si_normalize.in"
+  norm_in="norm.in"
   cp "$in_files_dir/$norm_in" "$script_dir/$norm_in"
+  cp "$input_files_dir/norm.input.data" "$script_dir"
 
   norm_dir="$results_dir/norm"
   create_compute_results_dir $norm_dir

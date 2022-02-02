@@ -249,7 +249,8 @@ above_surface() {
       compute_dir="$results_dir/$compute_name"
       for threshold_i in $(seq 1 6)
       do
-        $data_parser "u" $compute_dir/$dump_last_10 $results_dir/tmp "$(thresholds_at $threshold_i)"
+        debug="$data_parser 'u' $compute_dir/$dump_last_10 $results_dir/tmp $(thresholds_at $threshold_i)"
+        echo $debug
         vals=$(cat $results_dir/tmp)
         printf "%5d" $val >> $tmp
       done

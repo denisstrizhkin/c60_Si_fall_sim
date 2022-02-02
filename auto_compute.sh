@@ -250,8 +250,8 @@ above_surface() {
       for threshold_i in {0..5}
       do
         $data_parser "u" $compute_dir/$dump_last_10 $results_dir/tmp "$(thresholds_at $threshold_i)"
-        tmp=$(cat $results_dir/tmp)
-        printf "%5d" $tmp >> $tmp
+        vals=$(cat $results_dir/tmp)
+        printf "%5d" $val >> $tmp
       done
       echo "" >> $tmp
     done

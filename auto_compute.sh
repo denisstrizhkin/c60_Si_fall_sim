@@ -222,12 +222,12 @@ above_surface() {
   touch $tmp
 
   thresholds=""
-  thresholds="${angles} 0.0"
-  thresholds="${angles} 0.2"
-  thresholds="${angles} 0.4"
-  thresholds="${angles} 0.6"
-  thresholds="${angles} 0.8"
-  thresholds="${angles} 1.0"
+  thresholds="${thresholds} 0.0"
+  thresholds="${thresholds} 0.2"
+  thresholds="${thresholds} 0.4"
+  thresholds="${thresholds} 0.6"
+  thresholds="${thresholds} 0.8"
+  thresholds="${thresholds} 1.0"
   thresholds_at() { echo ${angles} | cut -d" " -f${1}; }
 
   printf "************" >> $tmp

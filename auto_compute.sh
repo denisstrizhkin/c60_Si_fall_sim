@@ -247,7 +247,7 @@ above_surface() {
       echo "compute: $compute_name"; echo; echo "$STARS"
 
       compute_dir="$results_dir/$compute_name"
-      for threshold_i in {0..5}
+      for threshold_i in {1..6}
       do
         $data_parser "u" $compute_dir/$dump_last_10 $results_dir/tmp "$(thresholds_at $threshold_i)"
         vals=$(cat $results_dir/tmp)

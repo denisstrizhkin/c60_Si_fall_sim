@@ -181,72 +181,79 @@ angle_fall() {
   done
 }
 
+#above_surface() {
+#  vals=$results_dir/above_surface.vals
+#  rm -rf $vals
+#  touch $vals
+#
+#  #thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
+#  #thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
+#  printf "****************" >> $vals
+#  for threshold_i in {0..5}
+#  do
+#    printf "__%1.1f" ${thresholdss[threshold_i]} >> $vals
+#  done
+#  echo "" >> $vals
+#
+#  for speed_i in "${speeds[@]}"
+#  do
+#    for move_i in {1..5}
+#    do
+#      printf "m: %2d,a: %3.2f|" $move_i $speed_i >> $vals
+#
+#      compute_name="moved_${move_i}_speed_${speed_i}"
+#      echo "compute: $compute_name"; echo; echo "$stars"
+#
+#      compute_dir="$results_dir/$compute_name"
+#      for threshold_i in {0..5}
+#      do
+#        $data_parser "u" $compute_dir/$dump_last_10 $results_dir/tmp "${thresholds[threshold_i]}"
+#        data=$(cat $results_dir/tmp)
+#        printf "%5d" $data >> $vals
+#      done
+#      echo "" >> $vals
+#    done
+#  done
+#}
+
 above_surface() {
-  vals=$RESULT_DIR/above_surface.vals
-  rm -rf $vals
-  touch $vals
+  tmp=$results_dir/above_surface.vals
+  rm -rf $tmp
+  touch $tmp
 
-  #thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
-  #thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
-  printf "****************" >> $vals
-  for threshold_i in {0..5}
+  thresholds=""
+  thresholds="${angles} 0.0"
+  thresholds="${angles} 0.2"
+  thresholds="${angles} 0.4"
+  thresholds="${angles} 0.6"
+  thresholds="${angles} 0.8"
+  thresholds="${angles} 1.0"
+  thresholds_at() { echo ${angles} | cut -d" " -f${1}; }
+
+  printf "************" >> $tmp
+  for threshold_i in (seq 1 6)
   do
-    printf "__%1.1f" ${thresholdss[threshold_i]} >> $vals
+    printf "__%1.1f" $(thresholds_at threshold_i) >> $tmp
   done
-  echo "" >> $vals
+  echo "" >> $tmp
 
-  for speed_i in "${speeds[@]}"
+  for move_i in (seq 1 5)
   do
-    for move_i in {1..5}
+    for angle_i in (seq 1 2)
     do
-      printf "m: %2d,a: %3.2f|" $move_i $speed_i >> $vals
+      printf "m: %2d,a: %2d|" $move_i $(angles_at angle_i) >> $tmp
 
-      COMPUTE_NAME="moved_${move_i}_speed_${speed_i}"
-      echo "compute: $COMPUTE_NAME"; echo; echo "$stars"
+      compute_name="moved_${move_i}_angle_$(angles_at $angle_i)"
+      echo "compute: $compute_name"; echo; echo "$STARS"
 
-      COMPUTE_DIR="$RESULT_DIR/$COMPUTE_NAME"
+      compute_dir="$results_dir/$compute_name"
       for threshold_i in {0..5}
       do
-        $data_parser "u" $COMPUTE_DIR/$dump_last_10 $RESULT_DIR/tmp "${thresholds[threshold_i]}"
-        data=$(cat $RESULT_DIR/tmp)
-        printf "%5d" $data >> $vals
+        $data_parser "u" $compute_dir/$dump_last_10 $results_dir/tmp "$(thresholds_at threshold_i)"
+        tmp=$(cat $results_dir/tmp)
+        printf "%5d" $tmp >> $tmp
       done
-      echo "" >> $vals
-    done
-  done
-}
-
-above_surface() {
-  TMP=$RESULT_DIR/above_surface.vals
-  rm -rf $TMP
-  touch $TMP
-
- # thresholds=("0" "0.2" "0.4" "0.6" "0.8" "1")
- # thresholdss=("0" "0,2" "0,4" "0,6" "0,8" "1")
-  printf "************" >> $TMP
-  for threshold_i in {0..5}
-  do
-    printf "__%1.1f" ${thresholdss[threshold_i]} >> $TMP
-  done
-  echo "" >> $TMP
-
-  for move_i in {1..5}
-  do
-    for angle_i in {0..3}
-    do
-      printf "m: %2d,a: %2d|" $move_i ${ANGLES[angle_i]} >> $TMP
-
-      COMPUTE_NAME="angle_${ANGLES[angle_i]}_move_${move_i}"
-      echo "compute: $COMPUTE_NAME"; echo; echo "$STARS"
-
-      COMPUTE_DIR="$RESULT_DIR/$COMPUTE_NAME"
-      for threshold_i in {0..5}
-      do
-        $DATA_PARSER "u" $COMPUTE_DIR/$DUMP_LAST10 $RESULT_DIR/tmp "${thresholds[threshold_i]}"
-        tmp=$(cat $RESULT_DIR/tmp)
-        printf "%5d" $tmp >> $TMP
-      done
-      echo "" >> $TMP
+      echo "" >> $tmp
     done
   done
 }

@@ -231,15 +231,15 @@ above_surface() {
   thresholds_at() { echo ${angles} | cut -d" " -f${1}; }
 
   printf "************" >> $tmp
-  for threshold_i in (seq 1 6)
+  for threshold_i in $(seq 1 6)
   do
     printf "__%1.1f" $(thresholds_at threshold_i) >> $tmp
   done
   echo "" >> $tmp
 
-  for move_i in (seq 1 5)
+  for move_i in $(seq 1 5)
   do
-    for angle_i in (seq 1 2)
+    for angle_i in $(seq 1 2)
     do
       printf "m: %2d,a: %2d|" $move_i $(angles_at angle_i) >> $tmp
 

@@ -233,7 +233,7 @@ above_surface() {
   printf "************" >> $tmp
   for threshold_i in $(seq 1 6)
   do
-    printf "__%1.1f" $(thresholds_at threshold_i) >> $tmp
+    printf "__%1.1f" $(thresholds_at $threshold_i) >> $tmp
   done
   echo "" >> $tmp
 
@@ -241,7 +241,7 @@ above_surface() {
   do
     for angle_i in $(seq 1 2)
     do
-      printf "m: %2d,a: %2d|" $move_i $(angles_at angle_i) >> $tmp
+      printf "m: %2d,a: %2d|" $move_i $(angles_at $angle_i) >> $tmp
 
       compute_name="moved_${move_i}_angle_$(angles_at $angle_i)"
       echo "compute: $compute_name"; echo; echo "$STARS"
@@ -249,7 +249,7 @@ above_surface() {
       compute_dir="$results_dir/$compute_name"
       for threshold_i in {0..5}
       do
-        $data_parser "u" $compute_dir/$dump_last_10 $results_dir/tmp "$(thresholds_at threshold_i)"
+        $data_parser "u" $compute_dir/$dump_last_10 $results_dir/tmp "$(thresholds_at $threshold_i)"
         tmp=$(cat $results_dir/tmp)
         printf "%5d" $tmp >> $tmp
       done

@@ -221,13 +221,16 @@ above_surface() {
   rm -rf $tmp
   touch $tmp
 
+  numeric_backup=$LC_NUMERIC
+  export LC_NUMERIC=en_US.UTF
+
   thresholds=""
-  thresholds="${thresholds} 0,0"
-  thresholds="${thresholds} 0,2"
-  thresholds="${thresholds} 0,4"
-  thresholds="${thresholds} 0,6"
-  thresholds="${thresholds} 0,8"
-  thresholds="${thresholds} 1,0"
+  thresholds="${thresholds} 0.0"
+  thresholds="${thresholds} 0.2"
+  thresholds="${thresholds} 0.4"
+  thresholds="${thresholds} 0.6"
+  thresholds="${thresholds} 0.8"
+  thresholds="${thresholds} 1.0"
   thresholds_at() { echo ${thresholds} | cut -d" " -f${1}; }
 
   printf "************" >> $tmp
@@ -253,11 +256,13 @@ above_surface() {
         $data_parser 'u' $compute_dir/$dump_last_10 $results_dir/tmp $(thresholds_at $threshold_i)
         echo $debug
         vals=$(cat $results_dir/tmp)
-        printf "%5d" $val >> $tmp
+        printf "%5d" $vals >> $tmp
       done
       echo "" >> $tmp
     done
   done
+
+  LC_NUMERIC=$numeric_backup
 }
 
 echo "### LAMMPS AUTOCOMPUTE SCRIPT ###"; echo; echo "$stars"

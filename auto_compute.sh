@@ -222,7 +222,7 @@ above_surface() {
   touch $tmp
 
   numeric_backup=$LC_NUMERIC
-  export LC_NUMERIC=en_US.UTF
+  export LC_NUMERIC=en_US.utf8
 
   thresholds=""
   thresholds="${thresholds} 0.0"

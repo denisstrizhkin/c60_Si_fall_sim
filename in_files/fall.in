@@ -68,14 +68,15 @@ compute   atom_ke all ke/atom
 reset_timestep 0
 timestep       0.001
 thermo         5
-thermo_style   custom step pe ke etotal c_above_zero_lvl time dt
+thermo_style   custom step pe ke etotal c_above_zero_lvl temp time dt
 #thermo_modify  lost ignore
 
 # FIX
 fix f_1 all nve
-fix f_2 g_si_thermostat nvt temp 1e-3 1e-3 $(100.0*dt)
+# fix f_2 g_si_thermostat nvt temp 300.0 300.0 $(100.0*dt)
+fix f_2 g_si_thermostat langevin e-3 e-3 100.0 699483
 fix f_3 all electron/stopping 10.0 potentials/elstop-table.txt region r_si_all
-fix f_4 all dt/reset 5 0.001 NULL 0.1
+# fix f_4 all dt/reset 5 0.001 NULL 0.1
 
 # DUMP
 dump  d_vor g_output custom 20 vor_time.dump v_vacancies v_sputter_all &
@@ -86,7 +87,7 @@ dump  d_all all custom 20 all.dump id type x y z vx vy vz c_atom_ke
 velocity  g_fu set v_carbon_vx NULL v_carbon_vz sum yes units box
 
 # RUN
-run 5000
+run 1000
 
 # LAST STEP DUMP
 undump  d_vor

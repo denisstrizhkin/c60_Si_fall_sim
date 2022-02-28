@@ -24,6 +24,7 @@ run_lammps_script() {
   echo; echo "$stars"
 
   copy_lammps_results $output_dir
+  parse_dump_files $output_dir
 
   clean
 }

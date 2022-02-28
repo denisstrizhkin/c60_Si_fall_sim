@@ -153,7 +153,6 @@ straight_fall() {
       change_template_in_file "-$speed_i" "0"
 
       run_lammps_script "$1" "$script_dir/$fall_in" "$compute_dir"
-      # parse_dump_files "$compute_dir"
     done
   done
 }

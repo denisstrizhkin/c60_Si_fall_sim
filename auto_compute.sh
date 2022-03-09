@@ -19,7 +19,7 @@ data_parser="$script_dir/lammps_data_parser/lammps_data_parser"
 
 # templates
 in_template="$in_files_dir/fall.in"
-input_template="$input_files_dir/fall.input.data"
+input_template="$input_files_dir/fall700.input.data"
 
 ### FILE NAMES ###
 
@@ -44,7 +44,7 @@ dump_vor="vor_time.dump"
 ### OTHER VARS
 
 # zero level
-zero_lvl="0"
+zero_lvl="0.5"
 
 # computes speeds
 speeds=""
@@ -138,7 +138,7 @@ straight_fall() {
   # variants loop
   for speed_i in ${speeds}
   do
-    for move_i in $(seq 1 1) # seq 1 n(5)
+    for move_i in $(seq 1 5) # seq 1 n(5)
     do
       compute_name="moved_${move_i}_speed_${speed_i}"
       echo "compute: $compute_name"; echo; echo "$stars"

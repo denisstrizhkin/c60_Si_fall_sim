@@ -3,7 +3,6 @@ variable zero_lvl equal "-0.0184635"
 variable carbon_vz equal "-231"
 variable carbon_vx equal "0"
 
-variable num_of_c equal "60"
 variable z_coord_threshold equal "12"
 variable z_speed_threshold equal "0.5"
 
@@ -15,14 +14,31 @@ atom_style  atomic
 atom_modify map yes
 read_data   fall.input.data
 
-# GROUPS
-group   g_fu type 2
-group   g_si_all type 1
+# ADD C60 MOLECULE
+molecule m_C60 input_files/mol.txt
+create_atoms 1 single 0 0 30 mol m_C60 1
+
+# REGIONS
 lattice diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
-region  r_si_center block -11 11 -11 11 -34 0 units lattice
-region  r_si_all    block -12 12 -12 12 -35 0 units lattice
+
+region  r_si_center  block -11 11 -11 11 -34 0 units lattice
+region  r_si_all     block -12 12 -12 12 -35 0 units lattice
+
+region  r_floor   block -12  12 -12  12 -35 -34
+region  r_x_left  block -12 -11 -12  12 -35 0
+region  r_x_right block  11  12 -12  12 -35 0
+region  r_y_left  block -12  12 -12 -11 -35 0
+region  r_y_right block -12  12  11  12 -35 0
+
+region  r_thermostat union 5 r_floor r_x_right r_x_left r_y_right r_y_left
+
+# GROUPS
+group   g_fu     type 2
+group   g_si_all type 1
+
 group   g_si_center region r_si_center
-group   g_si_thermostat subtract g_si_all g_si_center
+group   g_thermostat dynamic g_si_all region r_thermostat
+
 group   g_output id 1
 
 # POTENTIAL
@@ -45,13 +61,6 @@ variable  is_vacancy atom "c_voro_occupation[1]==0"
 compute   vacancy_sum g_si_all reduce sum v_is_vacancy
 variable  vacancies atom "c_vacancy_sum"
 
-#variable  vIntTemp1 atom "c_vOcu[1]*(c_vOcu[1]>1)"
-#variable  vIntTemp2 atom "c_vOcu[1]>1"
-#variable  vIntTemp3 atom "v_vIntTemp1-v_vIntTemp2"
-#compute   vIntTemp3 g_si_all reduce sum v_vIntTemp3
-#variable  vInt atom "c_vIntTemp3-v_num_of_c"
-#variable  interstitials equal "c_vIntTemp3-v_num_of_c"
-
 # sputtered atoms
 variable  is_sputtered atom "(z>v_z_coord_threshold)&&(vz>v_z_speed_threshold)"
 compute   sputter_sum_all  all       reduce sum v_is_sputtered
@@ -61,22 +70,19 @@ variable  sputter_all atom "c_sputter_sum_all"
 variable  sputter_si  atom "c_sputter_sum_si"
 variable  sputter_c   atom "c_sputter_sum_c"
 
-#per atom ke
+# compute ke per atom
 compute   atom_ke all ke/atom
 
 # THERMO
 reset_timestep 0
 timestep       0.001
-thermo         5
-thermo_style   custom step pe ke etotal c_above_zero_lvl temp time dt
-#thermo_modify  lost ignore
+thermo         50
+thermo_style   custom step pe ke etotal temp c_above_zero_lvl c_sputter_sum_all
 
 # FIX
 fix f_1 all nve
-# fix f_2 g_si_thermostat nvt temp 300.0 300.0 $(100.0*dt)
-fix f_2 g_si_thermostat langevin e-3 e-3 100.0 699483
+fix f_2 g_thermostat langevin e-3 e-3 100.0 699483
 fix f_3 all electron/stopping 10.0 potentials/elstop-table.txt region r_si_all
-# fix f_4 all dt/reset 5 0.001 NULL 0.1
 
 # DUMP
 dump  d_vor g_output custom 20 vor_time.dump v_vacancies v_sputter_all &
@@ -87,7 +93,7 @@ dump  d_all all custom 20 all.dump id type x y z vx vy vz c_atom_ke
 velocity  g_fu set v_carbon_vx NULL v_carbon_vz sum yes units box
 
 # RUN
-run 1000
+run 5000
 
 # LAST STEP DUMP
 undump  d_vor
@@ -107,7 +113,7 @@ dump    d_last10 all custom 5 last_10.dump id type x y z vx vy vz &
     v_is_sputtered v_c_z_dist
 
 # RUN LAST 10
-run 50
+run 10
 
 # WRITE DATA
 write_data  fall.output.data

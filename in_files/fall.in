@@ -6,6 +6,8 @@ variable carbon_vx equal "0"
 variable z_coord_threshold equal "12"
 variable z_speed_threshold equal "0.5"
 
+
+variable comp_temp equal "700"
 # INIT
 units       metal
 dimension   3
@@ -29,7 +31,6 @@ region  r_x_left  block -12 -11 -12  12 -35 0
 region  r_x_right block  11  12 -12  12 -35 0
 region  r_y_left  block -12  12 -12 -11 -35 0
 region  r_y_right block -12  12  11  12 -35 0
-
 region  r_thermostat union 5 r_floor r_x_right r_x_left r_y_right r_y_left
 
 # GROUPS
@@ -38,6 +39,7 @@ group   g_si_all type 1
 
 group   g_si_center region r_si_center
 group   g_thermostat dynamic g_si_all region r_thermostat
+# group   g_thermostat dynamic g_si_all region r_floor
 
 group   g_output id 1
 
@@ -81,7 +83,7 @@ thermo_style   custom step pe ke etotal temp c_above_zero_lvl c_sputter_sum_all
 
 # FIX
 fix f_1 all nve
-fix f_2 g_thermostat langevin e-3 e-3 100.0 699483
+fix f_2 g_thermostat langevin ${comp_temp} ${comp_temp} 0.01 699483
 fix f_3 all electron/stopping 10.0 potentials/elstop-table.txt region r_si_all
 
 # DUMP

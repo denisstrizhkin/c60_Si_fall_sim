@@ -6,9 +6,12 @@ variable carbon_vx equal "0"
 variable z_coord_threshold equal "12"
 variable z_speed_threshold equal "0.5"
 
+variable comp_temp equal "300"
 
-variable comp_temp equal "700"
 # INIT
+variable    N loop 5
+label       loop
+
 units       metal
 dimension   3
 boundary    p p m
@@ -27,21 +30,24 @@ region  r_si_center  block -11 11 -11 11 -34 0 units lattice
 region  r_si_all     block -12 12 -12 12 -35 0 units lattice
 
 region  r_floor   block -12  12 -12  12 -35 -34
-region  r_x_left  block -12 -11 -12  12 -35 0
-region  r_x_right block  11  12 -12  12 -35 0
-region  r_y_left  block -12  12 -12 -11 -35 0
-region  r_y_right block -12  12  11  12 -35 0
-region  r_thermostat union 5 r_floor r_x_right r_x_left r_y_right r_y_left
+# region  r_x_left  block -12 -11 -12  12 -35 0
+# region  r_x_right block  11  12 -12  12 -35 0
+# region  r_y_left  block -12  12 -12 -11 -35 0
+# region  r_y_right block -12  12  11  12 -35 0
+# region  r_thermostat union 5 r_floor r_x_right r_x_left r_y_right r_y_left
 
 # GROUPS
 group   g_fu     type 2
 group   g_si_all type 1
 
 group   g_si_center region r_si_center
-group   g_thermostat dynamic g_si_all region r_thermostat
-# group   g_thermostat dynamic g_si_all region r_floor
+# group   g_thermostat dynamic g_si_all region r_thermostat
+group   g_thermostat dynamic g_si_all region r_floor
 
 group   g_output id 1
+
+# MOVE C60
+displace_atoms g_fu move $N 0 0
 
 # POTENTIAL
 pair_style  hybrid airebo 3.0 tersoff/zbl
@@ -95,7 +101,7 @@ dump  d_all all custom 20 all.dump id type x y z vx vy vz c_atom_ke
 velocity  g_fu set v_carbon_vx NULL v_carbon_vz sum yes units box
 
 # RUN
-run 5000
+run 100
 
 # LAST STEP DUMP
 undump  d_vor
@@ -119,3 +125,13 @@ run 10
 
 # WRITE DATA
 write_data  fall.output.data
+
+variable compute_dir string "results/straight_fall${carbon_vz}_${N}"
+shell "rm -rf" ${compute_dir}
+shell "mkdir -p" ${compute_dir}
+shell functions/copy_results.sh ${compute_dir}
+shell functions/parse_data.sh ${compute_dir}
+
+clear
+next N
+jump SELF loop

@@ -19,7 +19,7 @@ data_parser="$script_dir/lammps_data_parser/lammps_data_parser"
 
 # templates
 in_template="$in_files_dir/fall.in"
-input_template="$input_files_dir/fall700.input.data"
+input_template="$input_files_dir/fall300.input.data"
 
 ### FILE NAMES ###
 
@@ -138,22 +138,12 @@ straight_fall() {
   # variants loop
   for speed_i in ${speeds}
   do
-    for move_i in $(seq 1 5) # seq 1 n(5)
-    do
-      compute_name="moved_${move_i}_speed_${speed_i}"
-      echo "compute: $compute_name"; echo; echo "$stars"
+    echo "compute: $compute_name"; echo; echo "$stars"
 
-      compute_dir="$results_dir/$compute_name"
-      new_input_data="$compute_dir/$fall_input"
-      new_in_data="$compute_dir/$fall_in"
+    change_template_in_file "-$speed_i" "0"
+    cp $input_template $script_dir/$fall_input
 
-      create_compute_results_dir "$compute_dir"
-
-      randomize_carbon_xy_position "$new_input_data" "0"
-      change_template_in_file "-$speed_i" "0"
-
-      run_lammps_script "$1" "$script_dir/$fall_in" "$compute_dir"
-    done
+    run_lammps_script "$1" "$script_dir/$fall_in" "$compute_dir"
   done
 }
 

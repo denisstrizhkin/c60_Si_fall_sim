@@ -18,13 +18,13 @@ run_lammps_script() {
   set_omp_num_threads $(get_omp_num_threads $omp_num_threads)
 
   echo "running lammps script"; echo " ---"
-  #mpirun --use-hwthread-cpus -np 8 lmp_mpi -in "$script_dir/$in_file" 
+  #mpirun --use-hwthread-cpus -np 8 lmp_mpi -in "$script_dir/$in_file"
   #mpirun -np 4 lmp_omp -sf omp -pk omp 4 -in "$script_dir/$in_file"
   lmp_omp -sf omp -in "$in_file"
   echo; echo "$stars"
 
-  copy_lammps_results $output_dir
-  parse_dump_files $output_dir
+  #copy_lammps_results $output_dir
+  #parse_dump_files $output_dir
 
   clean
 }
@@ -33,5 +33,5 @@ run_lammps_script() {
 set_omp_num_threads() {
   export OMP_NUM_THREADS="$1"
   echo "set number of OpenMP threads to $OMP_NUM_THREADS";
-  echo; echo "$stars" 
+  echo; echo "$stars"
 }

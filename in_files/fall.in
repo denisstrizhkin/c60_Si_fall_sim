@@ -47,7 +47,8 @@ group   g_thermostat dynamic g_si_all region r_floor
 group   g_output id 1
 
 # MOVE C60
-displace_atoms g_fu move $N 0 0
+variable delta equal "v_N * 0.5"
+displace_atoms g_fu move ${delta} 0 0
 
 # POTENTIAL
 pair_style  hybrid airebo 3.0 tersoff/zbl

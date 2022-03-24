@@ -1,5 +1,5 @@
 # VARIABLES
-variable temperature equal "300.0"
+variable temperature equal "1e-6"
 # VARIABLES END
 
 # INIT

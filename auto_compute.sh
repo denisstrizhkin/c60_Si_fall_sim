@@ -19,7 +19,7 @@ data_parser="$script_dir/lammps_data_parser/lammps_data_parser"
 
 # templates
 in_template="$in_files_dir/fall.in"
-input_template="$input_files_dir/fall300.input.data"
+input_template="$input_files_dir/fall.input.data"
 
 ### FILE NAMES ###
 

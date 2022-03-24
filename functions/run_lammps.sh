@@ -26,7 +26,7 @@ run_lammps_script() {
   #copy_lammps_results $output_dir
   #parse_dump_files $output_dir
 
-  clean
+  #clean
 }
 
 # set number of OpenMP threads

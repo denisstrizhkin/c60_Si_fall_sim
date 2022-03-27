@@ -18,8 +18,8 @@ input_files_dir="$script_dir/input_files"
 data_parser="$script_dir/lammps_data_parser/lammps_data_parser"
 
 # templates
-in_template="$in_files_dir/fall.in"
-input_template="$input_files_dir/fall.input.data"
+in_template="$in_files_dir/test.in"
+input_template="$input_files_dir/test.input.data"
 
 ### FILE NAMES ###
 
@@ -30,10 +30,10 @@ log="log.lammps"
 output="fall.output.data"
 
 # .in file
-fall_in="fall.in"
+fall_in="test.in"
 
 # input file
-fall_input="fall.input.data"
+fall_input="test.input.data"
 
 # dump files
 dump_all="all.dump"

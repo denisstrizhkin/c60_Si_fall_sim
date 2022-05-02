@@ -7,7 +7,6 @@ script_dir="$(dirname "$0")"
 
 # sources
 . "$script_dir/functions/run_lammps.sh"
-. "$script_dir/functions/utility.sh"
 
 # folders
 results_dir="$script_dir/results"
@@ -18,28 +17,16 @@ input_files_dir="$script_dir/input_files"
 data_parser="$script_dir/lammps_data_parser/lammps_data_parser"
 
 # templates
-in_template="$in_files_dir/test.in"
-input_template="$input_files_dir/test.input.data"
+in_template="$in_files_dir/fall.in"
+input_template="$input_files_dir/fall700.input.data"
 
 ### FILE NAMES ###
 
-# log file
-log="log.lammps"
-
-# output file
-output="fall.output.data"
-
 # .in file
-fall_in="test.in"
+fall_in="fall.in"
 
 # input file
-fall_input="test.input.data"
-
-# dump files
-dump_all="all.dump"
-dump_last_10="last_10.dump"
-dump_last_step="last_step.dump"
-dump_vor="vor_time.dump"
+fall_input="fall.input.data"
 
 ### OTHER VARS
 
@@ -97,40 +84,6 @@ clean() {
   rm -f "$script_dir/"*.lammps
 
   echo "removed temp compute files"; echo; echo "$stars"
-}
-
-# get lammps data parser
-get_parser() {
-  rm -rf "lammps_data_parser"
-  git clone https://github.com/denisstrizhkin/lammps_data_parser
-  cd lammps_data_parser
-  cmake .
-  make lammps_data_parser
-}
-
-# normalize Si crystal after setting specific temperature
-si_norm() {
-  temperature=300
-
-  norm_in="norm.in"
-  cp "$in_files_dir/$norm_in" "$script_dir/$norm_in"
-  cp "$input_files_dir/norm.input.data" "$script_dir"
-
-  norm_dir="$results_dir/norm"
-  create_compute_results_dir $norm_dir
-
-  run_lammps_script "$1" "$script_dir/$norm_in" "$norm_dir"
-}
-
-# minimize Si crystal
-si_min() {
-  si_min_in="si_min.in"
-  cp "$in_files_dir/$si_min_in" "$script_dir/$si_min_in"
-
-  si_min_dir="$results_dir/si_min"
-  create_compute_results_dir $si_min_dir
-
-  run_lammps_script "$1" "$script_dir/$si_min_in" "$si_min_dir"
 }
 
 # auto computation for straight fall with different speeds and positions

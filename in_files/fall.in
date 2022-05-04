@@ -1,15 +1,15 @@
 # CONSTANTS
-#variable zero_lvl equal "-0.0184635"
+variable zero_lvl equal "83.0"
 #variable carbon_vz equal "-231"
-#variable carbon_vx equal "0"
+variable carbon_vx equal "0"
 
-#variable z_coord_threshold equal "12"
-#variable z_speed_threshold equal "0.5"
+variable z_coord_threshold equal "95.0"
+variable z_speed_threshold equal "0.5"
 
-#variable comp_temp equal "1e-6"
+variable comp_temp equal "700"
 
 # INIT
-variable    N loop 1
+variable    N loop 5
 label       loop
 
 units       metal
@@ -26,30 +26,27 @@ create_atoms 1 single 0 0 108.6 mol m_C60 1
 # REGIONS
 lattice diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
 
-region  r_si_all     block -12 12 -12 12 -35 0 units lattice
+region  r_si_all     block -12 12 -12 12 -16 15.5 units lattice
 
-region  r_floor   block -12  12 -12  12 -35 -34
-region  r_x_left  block -12 -11 -12  12 -35 0
-region  r_x_right block  11  12 -12  12 -35 0
-region  r_y_left  block -12  12 -12 -11 -35 0
-region  r_y_right block -12  12  11  12 -35 0
-region  r_thermostat union 5 r_floor r_x_right r_x_left r_y_right r_y_left
+region  r_floor   block -12  12 -12  12 -16 -15
+region  r_x_left  block -12 -11 -12  12 -16 15.5
+region  r_x_right block  11  12 -12  12 -16 15.5
+region  r_y_left  block -12  12 -12 -11 -16 15.5
+region  r_y_right block -12  12  11  12 -16 15.5
+
+region  r_bath union 5 r_floor r_x_right r_x_left r_y_right r_y_left
 
 # GROUPS
 group   g_fu     type 2
 group   g_si_all type 1
 
-group   g_si_center region r_si_center
-
 # group   g_thermostat dynamic g_si_all region r_thermostat
 group   g_thermostat dynamic g_si_all region r_floor
 
-group   g_output id 1
-
 # MOVE C60
-# variable delta equal "(v_N * 0.25 + 1)^2-3"
-# variable delta equal "(v_N * 0.3)"
-# displace_atoms g_fu move ${delta} 0 0
+variable delta equal "(v_N * 0.25 + 1)^2-3"
+#variable delta equal "(v_N * 0.3)"
+displace_atoms g_fu move ${delta} 0 0
 
 # POTENTIAL
 pair_style  hybrid airebo 3.0 tersoff/zbl
@@ -69,61 +66,46 @@ compute   voro_occupation g_si_all voronoi/atom occupation only_group
 
 variable  is_vacancy atom "c_voro_occupation[1]==0"
 compute   vacancy_sum g_si_all reduce sum v_is_vacancy
-variable  vacancies atom "c_vacancy_sum"
+variable  vacancies equal "c_vacancy_sum"
 
 # sputtered atoms
 variable  is_sputtered atom "(z>v_z_coord_threshold)&&(vz>v_z_speed_threshold)"
 compute   sputter_sum_all  all       reduce sum v_is_sputtered
 compute   sputter_sum_si   g_si_all  reduce sum v_is_sputtered
 compute   sputter_sum_c    g_fu      reduce sum v_is_sputtered
-variable  sputter_all atom "c_sputter_sum_all"
-variable  sputter_si  atom "c_sputter_sum_si"
-variable  sputter_c   atom "c_sputter_sum_c"
+variable  sputter_all equal "c_sputter_sum_all"
+variable  sputter_si  equal "c_sputter_sum_si"
+variable  sputter_c   equal "c_sputter_sum_c"
 
 # compute ke per atom
-compute   atom_ke all ke/atom
+compute atom_ke all ke/atom
+variable c_z atom "z-v_zero_lvl"
+compute c_z_dist g_fu reduce sum v_c_z
+variable c_z_dist equal "c_c_z_dist / 60.0"
+variable step equal "step"
 
 # THERMO
 reset_timestep 0
 timestep       0.001
 thermo         50
-thermo_style   custom step pe ke etotal temp c_above_zero_lvl c_sputter_sum_all
+thermo_style   custom step pe ke etotal temp c_above_zero_lvl v_sputter_all
 
 # FIX
 fix f_1 all nve
-fix f_2 g_thermostat langevin ${comp_temp} ${comp_temp} 0.01 699483
+fix f_2 g_thermostat temp/berendsen ${comp_temp} ${comp_temp} 0.01 
 fix f_3 all electron/stopping 10.0 potentials/elstop-table.txt region r_si_all
 
+fix print_vor     all print 20 "${step} ${vacancies} ${sputter_all} ${sputter_si} ${sputter_c}" file voro.txt screen no
+fix print_C_z_dist all print 20 "${step} ${c_z_dist}" file C_z_dist.txt screen no
+
 # DUMP
-dump  d_vor g_output custom 20 vor_time.dump v_vacancies v_sputter_all &
-    v_sputter_si v_sputter_c
 dump  d_all all custom 20 all.dump id type x y z vx vy vz c_atom_ke
 
 # VELOCITY FU
-velocity  g_fu set v_carbon_vx NULL v_carbon_vz sum yes units box
+velocity  g_fu set v_carbon_vx NULL -${carbon_vz} sum yes units box
 
 # RUN
 run 5000
-
-# LAST STEP DUMP
-undump  d_vor
-undump  d_all
-dump    d_last_step all custom 2 last_step.dump id type x y z vx vy vz &
-    v_is_sputtered
-
-# RUN LAST STEP
-run 1
-
-# LAST 10 STEPS COMPUTES
-variable  c_z_dist atom "z-v_zero_lvl"
-
-# LAST 10 STEPS DUMPS
-undump  d_last_step
-dump    d_last10 all custom 5 last_10.dump id type x y z vx vy vz &
-    v_is_sputtered v_c_z_dist
-
-# RUN LAST 10
-run 10
 
 # WRITE DATA
 write_data  fall.output.data
@@ -132,7 +114,6 @@ variable compute_dir string "results/straight_fall${carbon_vz}_${N}"
 shell "rm -rf" ${compute_dir}
 shell "mkdir -p" ${compute_dir}
 shell functions/copy_results.sh ${compute_dir}
-shell functions/parse_data.sh ${compute_dir}
 
 clear
 next N

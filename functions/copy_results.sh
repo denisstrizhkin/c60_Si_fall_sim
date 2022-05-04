@@ -10,6 +10,8 @@ copy_lammps_results() {
   cp -f ./*.dump   $compute_dir
   # cp *.lammps files
   cp -f ./*.lammps $compute_dir
+  cp -f ./*.txt    $compute_dir
+
   echo "copied results"; echo; echo "$stars"
   echo "$compute_dir"
   echo "$compute_dir" > tmp_file

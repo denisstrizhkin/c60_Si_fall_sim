@@ -93,10 +93,10 @@ straight_fall() {
   do
     echo "compute: $compute_name"; echo; echo "$stars"
 
-    change_template_in_file "-$speed_i" "0"
+    cp $in_template $script_dir/$fall_in
     cp $input_template $script_dir/$fall_input
 
-    run_lammps_script "$1" "$script_dir/$fall_in" "$compute_dir"
+    run_lammps_script "$1" "$script_dir/$fall_in" "$compute_dir" "$speed_i"
   done
 }
 

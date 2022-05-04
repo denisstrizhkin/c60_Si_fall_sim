@@ -14,13 +14,14 @@ run_lammps_script() {
   local omp_num_threads=$1
   local in_file=$2
   local output_dir=$3
+  local speed_i=$4
 
   set_omp_num_threads $(get_omp_num_threads $omp_num_threads)
 
   echo "running lammps script"; echo " ---"
   #mpirun --use-hwthread-cpus -np 8 lmp_mpi -in "$script_dir/$in_file"
   #mpirun -np 4 lmp_omp -sf omp -pk omp 4 -in "$script_dir/$in_file"
-  lmp_omp -sf omp -in "$in_file"
+  lmp_omp -sf omp -in "$in_file" -var carbon_vz $speed_i
   echo; echo "$stars"
 
   #copy_lammps_results $output_dir

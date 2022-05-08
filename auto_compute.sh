@@ -37,9 +37,12 @@ zero_lvl="0.5"
 speeds=""
 #speeds="${speeds} 115.7"  # 500  eV
 #speeds="${speeds} 163.6"  # 1000 eV
-speeds="${speeds} 231.4"  # 2000 eV
+#speeds="${speeds} 231.4"  # 2000 eV
 #speeds="${speeds} 283.4"  # 3000 eV
+speeds="${speeds} 327.3"  # 4000 eV
 #speeds="${speeds} 365.88" # 5000 eV
+speeds="${speeds} 400.8"  # 6000 eV
+speeds="${speeds} 462.8"  # 8000 eV
 
 x_vels=""
 #x_vels="${x_vels} 79.1"  # 20

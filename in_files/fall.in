@@ -27,18 +27,21 @@ create_atoms 1 single 0 0 108.6 mol m_C60 1
 lattice diamond 5.43 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
 
 region  r_si_all     block -12 12 -12 12 -16 15.5 units lattice
+region  r_fixed      block -12 12 -12 12 -16 -15.5 units lattice
 
-region  r_floor   block -12  12 -12  12 -16 -15
-region  r_x_left  block -12 -11 -12  12 -16 15.5
-region  r_x_right block  11  12 -12  12 -16 15.5
-region  r_y_left  block -12  12 -12 -11 -16 15.5
-region  r_y_right block -12  12  11  12 -16 15.5
+region  r_floor   block -12  12 -12  12 -15.5 -15
+region  r_x_left  block -12 -11 -12  12 -15.5 15
+region  r_x_right block  11  12 -12  12 -15.5 15
+region  r_y_left  block -12  12 -12 -11 -15.5 15
+region  r_y_right block -12  12  11  12 -15.5 15
 
 region  r_bath union 5 r_floor r_x_right r_x_left r_y_right r_y_left
 
 # GROUPS
 group   g_fu     type 2
 group   g_si_all type 1
+group   g_fixed region r_fixed
+group   g_nve subtract all g_fixed
 
 # group   g_thermostat dynamic g_si_all region r_thermostat
 group   g_thermostat dynamic g_si_all region r_floor
@@ -88,10 +91,10 @@ variable step equal "step"
 reset_timestep 0
 timestep       0.001
 thermo         50
-thermo_style   custom step pe ke etotal temp c_above_zero_lvl v_sputter_all
+thermo_style   custom step pe ke etotal temp c_above_zero_lvl v_sputter_all v_vacancies
 
 # FIX
-fix f_1 all nve
+fix f_1 g_nve nve
 fix f_2 g_thermostat temp/berendsen ${comp_temp} ${comp_temp} 0.01 
 fix f_3 all electron/stopping 10.0 potentials/elstop-table.txt region r_si_all
 
